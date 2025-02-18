@@ -11,15 +11,18 @@ const api = axios.create({
 });
 
 // Interceptor para adicionar o token em todas as requisições
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('authToken');
-  if (token && config.headers) {
-    config.headers.Authorization = `Bearer ${token}`;
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('authToken');
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
-  return config;
-}, (error) => {
-  return Promise.reject(error);
-});
+);
 
 // Interceptor para tratar respostas e erros
 api.interceptors.response.use(
@@ -62,7 +65,7 @@ export interface PLC {
   tag_count?: number; // Novo campo para a contagem de tags
 }
 
-// PLCs endpoints
+// PLC endpoints
 export const getPLCs = async (): Promise<PLC[]> => {
   const response = await api.get('/plcs');
   return response.data;
@@ -84,6 +87,11 @@ export const updatePLC = async (id: number, data: Partial<PLC>): Promise<void> =
 
 export const deletePLC = async (id: number): Promise<void> => {
   await api.delete(`/plcs/${id}`);
+};
+
+// Nova função para reiniciar o PLC
+export const restartPLC = async (id: number): Promise<void> => {
+  await api.post(`/plcs/${id}/restart`);
 };
 
 // Tags endpoints

@@ -38,12 +38,15 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     if (message) {
       setPLCs((prev) => {
+        // Usa type assertion para tentar obter o name; se não existir, gera um nome padrão
+        const plcName = ((message.plc as any).name as string) || `PLC ${message.plc.plc_id}`;
         const exists = prev.some(plc => plc.id === message.plc.plc_id);
         if (exists) {
           return prev.map(plc =>
             plc.id === message.plc.plc_id
               ? {
                   ...plc,
+                  name: plcName,
                   status: message.plc.status,
                   last_update: message.plc.last_update,
                   tags: message.tags,
@@ -53,7 +56,7 @@ const Dashboard: React.FC = () => {
         } else {
           const newPLC: PLC = {
             id: message.plc.plc_id,
-            name: `PLC ${message.plc.plc_id}`,
+            name: plcName,
             status: message.plc.status,
             last_update: message.plc.last_update,
             ip_address: '',
