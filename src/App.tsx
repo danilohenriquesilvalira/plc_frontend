@@ -5,6 +5,8 @@ import { WebSocketProvider } from './contexts/WebSocketContext';
 import Login from './pages/auth/Login';
 import Dashboard from './pages/dashboard/Dashboard';
 import PLCs from './pages/plc/PLCs';
+import PLCMonitor from './pages/plc/PLCMonitor';
+import UserManagement from './pages/admin/UserManagement';
 import PrivateRoute from './components/auth/PrivateRoute';
 
 const App: React.FC = () => {
@@ -30,10 +32,19 @@ const App: React.FC = () => {
                 </PrivateRoute>
               }
             />
-            <Route path="/plcs/:id/tags" 
+            <Route
+              path="/plcs/:id/monitor"
               element={
                 <PrivateRoute>
-                  <PLCs />
+                  <PLCMonitor />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/admin/users"
+              element={
+                <PrivateRoute>
+                  <UserManagement />
                 </PrivateRoute>
               }
             />

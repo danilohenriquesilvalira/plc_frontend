@@ -1,4 +1,3 @@
-// src/components/Sidebar.tsx
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Database, Activity, Users, Settings, LogOut, Menu } from 'lucide-react';
@@ -15,8 +14,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, onLogout }) =>
   const menuItems = [
     { icon: <LayoutDashboard className="w-5 h-5" />, text: 'Dashboard', path: '/' },
     { icon: <Database className="w-5 h-5" />, text: 'PLCs', path: '/plcs' },
-    { icon: <Activity className="w-5 h-5" />, text: 'Monitoramento', path: '/monitoring' },
-    { icon: <Users className="w-5 h-5" />, text: 'Usuários', path: '/users' },
+    { icon: <Activity className="w-5 h-5" />, text: 'Monitoramento', path: '/plcmonitor' },
+    { icon: <Users className="w-5 h-5" />, text: 'Usuários', path: '/admin/users' },  // Updated path here
     { icon: <Settings className="w-5 h-5" />, text: 'Configurações', path: '/settings' },
   ];
 

@@ -32,14 +32,14 @@ const PLCs: React.FC = () => {
   });
   const [selectedPLC, setSelectedPLC] = useState<PLC | null>(null);
 
-  // Carregar dados iniciais
+  // Carrega os PLCs ao obter o token
   useEffect(() => {
     if (token) {
       fetchPLCs();
     }
   }, [token]);
 
-  // Atualizar com dados do WebSocket
+  // Atualiza os dados do PLC com as mensagens do WebSocket
   useEffect(() => {
     if (message && message.plc) {
       setPLCs(currentPLCs =>
@@ -57,7 +57,12 @@ const PLCs: React.FC = () => {
       setIsLoading(true);
       setError(null);
       const data = await getPLCs();
-      setPLCs(data);
+      // Normaliza o campo "active" convertendo 0/1 para false/true
+      const normalizedData = data.map((plc: PLC) => ({
+        ...plc,
+        active: Boolean(plc.active)
+      }));
+      setPLCs(normalizedData);
     } catch (error: any) {
       if (error?.response?.status === 401) {
         logout();
@@ -102,7 +107,7 @@ const PLCs: React.FC = () => {
       ip_address: plc.ip_address,
       rack: plc.rack,
       slot: plc.slot,
-      active: plc.active,
+      active: Boolean(plc.active) // Garante que seja booleano
     });
     setIsModalOpen(true);
   };
@@ -147,7 +152,7 @@ const PLCs: React.FC = () => {
     setError(null);
   };
 
-  // Card de PLC para visualização em mobile
+  // Card de PLC para visualização mobile
   const PLCCard = ({ plc }: { plc: PLC }) => (
     <div className="bg-slate-700/50 p-4 rounded-lg border border-slate-600">
       <div className="flex items-center justify-between mb-3">
@@ -164,7 +169,7 @@ const PLCs: React.FC = () => {
           )}
         </div>
       </div>
-      
+
       <div className="space-y-2 text-xs sm:text-sm">
         <div className="flex justify-between items-center">
           <span className="text-gray-400">IP:</span>
@@ -191,7 +196,7 @@ const PLCs: React.FC = () => {
           </span>
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-gray-400">Status:</span>
+          <span className="text-gray-400">Ativo:</span>
           <span className={`px-2 py-1 rounded-full text-xs font-medium ${
             plc.active
               ? 'bg-green-500/20 text-green-500'
@@ -318,7 +323,7 @@ const PLCs: React.FC = () => {
                   <div className="flex items-center">
                     <input
                       type="checkbox"
-                      checked={formData.active}
+                      checked={!!formData.active}
                       onChange={e => setFormData({ ...formData, active: e.target.checked })}
                       className="w-4 h-4 mr-2"
                     />
