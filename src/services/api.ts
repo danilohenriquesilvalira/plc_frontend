@@ -65,6 +65,43 @@ export interface PLC {
   tag_count?: number; // Novo campo para a contagem de tags
 }
 
+// Novas interfaces para tabelas e colunas
+export interface ColumnMetadata {
+  id: number;
+  table_id: number;
+  column_name: string;
+  data_type: string;
+  description: string;
+  tag_id?: number;
+  plc_id?: number;
+  is_timestamp: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TableMetadata {
+  id: number;
+  table_name: string;
+  description: string;
+  storage_type: 'permanent' | 'timeseries';
+  retention_days?: number; // Apenas para TimescaleDB
+  created_at: string;
+  updated_at: string;
+  columns?: ColumnMetadata[];
+}
+
+export interface TagMapping {
+  tag_id: number;
+  tag_name: string;
+  plc_id: number;
+  plc_name: string;
+  table_id: number;
+  table_name: string;
+  column_id: number;
+  column_name: string;
+  storage_type: 'permanent' | 'timeseries';
+}
+
 // PLC endpoints
 export const getPLCs = async (): Promise<PLC[]> => {
   const response = await api.get('/plcs');
@@ -116,4 +153,138 @@ export const updateTag = async (tagId: number, data: Partial<Tag>): Promise<void
 
 export const deleteTag = async (tagId: number): Promise<void> => {
   await api.delete(`/tags/${tagId}`);
+};
+
+
+// Tabelas permanentes (PostgreSQL)
+export const getPermanentTables = async (): Promise<TableMetadata[]> => {
+  const response = await api.get('/permanent/tables');
+  return response.data;
+};
+
+export const getPermanentTable = async (id: number): Promise<TableMetadata> => {
+  const response = await api.get(`/permanent/tables/${id}`);
+  return response.data;
+};
+
+export const createPermanentTable = async (data: Partial<TableMetadata>): Promise<TableMetadata> => {
+  const response = await api.post('/permanent/tables', {
+    ...data,
+    storage_type: 'permanent'
+  });
+  return response.data;
+};
+
+export const deletePermanentTable = async (id: number): Promise<void> => {
+  await api.delete(`/permanent/tables/${id}`);
+};
+
+// Tabelas de séries temporais (TimescaleDB)
+export const getTimeSeriesTables = async (): Promise<TableMetadata[]> => {
+  const response = await api.get('/timeseries/tables');
+  return response.data;
+};
+
+export const getTimeSeriesTable = async (id: number): Promise<TableMetadata> => {
+  const response = await api.get(`/timeseries/tables/${id}`);
+  return response.data;
+};
+
+export const createTimeSeriesTable = async (data: Partial<TableMetadata>): Promise<TableMetadata> => {
+  const response = await api.post('/timeseries/tables', {
+    ...data,
+    storage_type: 'timeseries'
+  });
+  return response.data;
+};
+
+export const deleteTimeSeriesTable = async (id: number): Promise<void> => {
+  await api.delete(`/timeseries/tables/${id}`);
+};
+
+// Todas as tabelas (combinação de permanentes e séries temporais)
+export const getAllTables = async (): Promise<TableMetadata[]> => {
+  const response = await api.get('/tables');
+  return response.data;
+};
+
+// Colunas para tabelas permanentes
+export const getPermanentColumns = async (tableId: number): Promise<ColumnMetadata[]> => {
+  const response = await api.get(`/permanent/tables/${tableId}/columns`);
+  return response.data;
+};
+
+export const addPermanentColumn = async (tableId: number, data: Partial<ColumnMetadata>): Promise<ColumnMetadata> => {
+  const response = await api.post(`/permanent/tables/${tableId}/columns`, data);
+  return response.data;
+};
+
+export const deletePermanentColumn = async (columnId: number): Promise<void> => {
+  await api.delete(`/permanent/columns/${columnId}`);
+};
+
+// Colunas para tabelas de séries temporais
+export const getTimeSeriesColumns = async (tableId: number): Promise<ColumnMetadata[]> => {
+  const response = await api.get(`/timeseries/tables/${tableId}/columns`);
+  return response.data;
+};
+
+export const addTimeSeriesColumn = async (tableId: number, data: Partial<ColumnMetadata>): Promise<ColumnMetadata> => {
+  const response = await api.post(`/timeseries/tables/${tableId}/columns`, data);
+  return response.data;
+};
+
+export const deleteTimeSeriesColumn = async (columnId: number): Promise<void> => {
+  await api.delete(`/timeseries/columns/${columnId}`);
+};
+
+// Mapeamento de tags para colunas
+export const mapTagToColumn = async (
+  tagId: number, 
+  tableId: number, 
+  columnId: number, 
+  plcId: number, 
+  storageType: 'permanent' | 'timeseries'
+): Promise<void> => {
+  await api.post(`/tags/${tagId}/map`, {
+    table_id: tableId,
+    column_id: columnId,
+    plc_id: plcId,
+    storage_type: storageType
+  });
+};
+
+export const getTagMappings = async (): Promise<TagMapping[]> => {
+  const response = await api.get('/tags/mappings');
+  return response.data;
+};
+
+// Consulta de dados
+export const queryTimeSeriesData = async (
+  tableId: number, 
+  params?: { 
+    start_time?: string, 
+    end_time?: string, 
+    limit?: number, 
+    offset?: number,
+    order_by?: string,
+    direction?: 'ASC' | 'DESC'
+  }
+): Promise<any[]> => {
+  const response = await api.get(`/timeseries/tables/${tableId}/data`, { params });
+  return response.data;
+};
+
+export const queryPermanentData = async (
+  tableId: number, 
+  params?: { 
+    limit?: number, 
+    offset?: number,
+    order_by?: string,
+    direction?: 'ASC' | 'DESC',
+    [key: string]: any
+  }
+): Promise<any[]> => {
+  const response = await api.get(`/permanent/tables/${tableId}/data`, { params });
+  return response.data;
 };

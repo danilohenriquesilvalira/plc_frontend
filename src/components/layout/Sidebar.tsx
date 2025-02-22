@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Database, Activity, Users, Settings, LogOut, Menu } from 'lucide-react';
+import { LayoutDashboard, Database, Activity, Users, Ship, LogOut, Menu, Table2 } from 'lucide-react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -10,22 +10,23 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, onLogout }) => {
   const location = useLocation();
-
+  
   const menuItems = [
     { icon: <LayoutDashboard className="w-5 h-5" />, text: 'Dashboard', path: '/' },
     { icon: <Database className="w-5 h-5" />, text: 'PLCs', path: '/plcs' },
     { icon: <Activity className="w-5 h-5" />, text: 'Monitoramento', path: '/plcmonitor' },
-    { icon: <Users className="w-5 h-5" />, text: 'Usuários', path: '/admin/users' },  // Updated path here
-    { icon: <Settings className="w-5 h-5" />, text: 'Configurações', path: '/settings' },
+    { icon: <Table2 className="w-5 h-5" />, text: 'Tabelas', path: '/tables' },
+    { icon: <Users className="w-5 h-5" />, text: 'Usuários', path: '/admin/users' },
+    { icon: <Ship className="w-5 h-5" />, text: 'Painel Eclusa', path: '/painel-eclusa' },
   ];
-
+  
   return (
     <aside
       className={`bg-slate-800 min-h-screen p-4 flex flex-col transition-all duration-300 border-r border-slate-700 ${
         isOpen ? 'w-64' : 'w-20'
       }`}
     >
-      {/* Container do cabeçalho: centraliza o botão se o sidebar estiver fechado */}
+      {/* Container do cabeçalho */}
       <div className={`flex items-center mb-8 ${isOpen ? 'justify-between' : 'justify-center'}`}>
         {isOpen && (
           <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
@@ -36,10 +37,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, onLogout }) =>
           <Menu className="w-6 h-6" />
         </button>
       </div>
+      
       <nav className="flex-1">
         <ul className="space-y-2">
           {menuItems.map((item, index) => {
-            const isActive = location.pathname === item.path;
+            const isActive = location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
             return (
               <li key={index}>
                 <Link
@@ -62,6 +64,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, onLogout }) =>
           })}
         </ul>
       </nav>
+      
       <div className="mt-auto pt-4 border-t border-slate-700">
         <button
           onClick={onLogout}

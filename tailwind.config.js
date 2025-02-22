@@ -17,6 +17,12 @@ export default {
         'gradient-xy': 'gradient-xy 15s ease infinite',
         'fade-in': 'fade-in 0.5s ease-out',
         'fade-in-up': 'fade-in-up 0.5s ease-out',
+        // Novas animações para o painel LED
+        'marquee': 'marquee 30s linear infinite',
+        'blink': 'blink 1s ease-in-out infinite',
+        'led-pulse': 'led-pulse 2s ease-in-out infinite',
+        'text-slide': 'text-slide 0.5s ease-out',
+        'glow': 'glow 1.5s ease-in-out infinite',
       },
       keyframes: {
         float: {
@@ -47,6 +53,43 @@ export default {
           '100%': {
             opacity: '1',
             transform: 'translateY(0)'
+          }
+        },
+        // Novos keyframes para o painel LED
+        marquee: {
+          '0%': { transform: 'translateX(100%)' },
+          '100%': { transform: 'translateX(-100%)' }
+        },
+        blink: {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.5' }
+        },
+        'led-pulse': {
+          '0%, 100%': {
+            textShadow: '0 0 5px currentColor',
+            filter: 'brightness(1)'
+          },
+          '50%': {
+            textShadow: '0 0 20px currentColor',
+            filter: 'brightness(1.2)'
+          }
+        },
+        'text-slide': {
+          '0%': {
+            transform: 'translateY(100%)',
+            opacity: '0'
+          },
+          '100%': {
+            transform: 'translateY(0)',
+            opacity: '1'
+          }
+        },
+        glow: {
+          '0%, 100%': {
+            boxShadow: '0 0 5px currentColor',
+          },
+          '50%': {
+            boxShadow: '0 0 20px currentColor',
           }
         }
       },

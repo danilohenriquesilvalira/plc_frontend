@@ -27,3 +27,43 @@ export interface WSMessage {
   status: string;
   last_update: string;
 }
+
+
+// Interfaces existentes
+
+// Novas interfaces para tabelas e colunas
+export interface ColumnMetadata {
+  id: number;
+  table_id: number;
+  column_name: string;
+  data_type: string;
+  description: string;
+  tag_id?: number;
+  plc_id?: number;
+  is_timestamp: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TableMetadata {
+  id: number;
+  table_name: string;
+  description: string;
+  storage_type: 'permanent' | 'timeseries';
+  retention_days?: number; // Apenas para TimescaleDB
+  created_at: string;
+  updated_at: string;
+  columns?: ColumnMetadata[];
+}
+
+export interface TagMapping {
+  tag_id: number;
+  tag_name: string;
+  plc_id: number;
+  plc_name: string;
+  table_id: number;
+  table_name: string;
+  column_id: number;
+  column_name: string;
+  storage_type: 'permanent' | 'timeseries';
+}
