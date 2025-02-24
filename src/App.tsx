@@ -13,6 +13,7 @@ import TableManager from './pages/tables/TableManager';
 import TableForm from './pages/tables/TableForm';
 import ColumnManager from './pages/tables/ColumnManager';
 import TagMapping from './pages/tables/TagMapping';
+import Monitoramento from './pages/monitoramento/monitoramento';
 
 const App: React.FC = () => {
   return (
@@ -61,7 +62,16 @@ const App: React.FC = () => {
                 </PrivateRoute>
               }
             />
-            {/* Novas rotas para gerenciamento de tabelas */}
+            {/* Nova rota para monitoramento do sistema */}
+            <Route
+              path="/monitoramento"
+              element={
+                <PrivateRoute>
+                  <Monitoramento />
+                </PrivateRoute>
+              }
+            />
+            {/* Rotas para gerenciamento de tabelas */}
             <Route
               path="/tables"
               element={

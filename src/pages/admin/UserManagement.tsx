@@ -14,7 +14,8 @@ import {
   Clock,
   CheckCircle,
   X,
-  Activity
+  Activity,
+  AlertTriangle
 } from 'lucide-react';
 
 interface User {
@@ -46,6 +47,7 @@ const UserManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [deleteConfirmUser, setDeleteConfirmUser] = useState<User | null>(null);
   const [formData, setFormData] = useState<CreateUserRequest>({
     username: '',
     password: '',
@@ -145,20 +147,19 @@ const UserManagement: React.FC = () => {
   };
 
   const handleDeleteUser = async (userId: number) => {
-    if (window.confirm('Tem certeza que deseja excluir este usuário?')) {
-      try {
-        await axios.delete(`${API_URL}/delete/${userId}`, {
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        await fetchUsers();
-        setError('');
-      } catch (error: any) {
-        console.error('Erro ao deletar usuário:', error);
-        setError(error.response?.data || 'Erro ao excluir usuário');
-      }
+    try {
+      await axios.delete(`${API_URL}/delete/${userId}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      await fetchUsers();
+      setDeleteConfirmUser(null);
+      setError('');
+    } catch (error: any) {
+      console.error('Erro ao deletar usuário:', error);
+      setError(error.response?.data || 'Erro ao excluir usuário');
     }
   };
 
@@ -166,7 +167,6 @@ const UserManagement: React.FC = () => {
     user.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // O resto do seu JSX permanece exatamente o mesmo
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-slate-900">
       <Sidebar
@@ -291,7 +291,7 @@ const UserManagement: React.FC = () => {
                       <th className="px-4 py-3 text-sm font-semibold text-gray-400">Função</th>
                       <th className="px-4 py-3 text-sm font-semibold text-gray-400">Criado em</th>
                       <th className="px-4 py-3 text-sm font-semibold text-gray-400">Última Atualização</th>
-                      <th className="px-4 py-3 text-sm font-semibold text-gray-400">Ações</th>
+                      <th className="px-4 py-3 text-sm font-semibold text-gray-400 text-center">Ações</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -325,7 +325,7 @@ const UserManagement: React.FC = () => {
                           {new Date(user.updated_at).toLocaleDateString()}
                         </td>
                         <td className="px-4 py-3">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 justify-center">
                             <button
                               onClick={() => {
                                 setSelectedUser(user);
@@ -337,7 +337,7 @@ const UserManagement: React.FC = () => {
                               <Edit className="w-4 h-4 text-blue-400" />
                             </button>
                             <button
-                              onClick={() => handleDeleteUser(user.id)}
+                              onClick={() => setDeleteConfirmUser(user)}
                               className="p-1 hover:bg-slate-700 rounded-lg transition-colors"
                               title="Excluir"
                             >
@@ -455,6 +455,39 @@ const UserManagement: React.FC = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Confirmação de Exclusão */}
+      {deleteConfirmUser && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-slate-800 rounded-xl border border-slate-600 p-6 w-full max-w-md">
+            <div className="mb-6 text-center">
+              <div className="bg-red-500/10 w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4">
+                <AlertTriangle className="w-8 h-8 text-red-500" />
+              </div>
+              <h3 className="text-xl font-bold text-white">Confirmar Exclusão</h3>
+              <p className="text-gray-400 mt-2">
+                Você tem certeza que deseja excluir o usuário <span className="text-white font-medium">{deleteConfirmUser.username}</span>?
+                <br />Esta ação não pode ser desfeita.
+              </p>
+            </div>
+
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={() => setDeleteConfirmUser(null)}
+                className="px-5 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => handleDeleteUser(deleteConfirmUser.id)}
+                className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+              >
+                Excluir
+              </button>
+            </div>
           </div>
         </div>
       )}

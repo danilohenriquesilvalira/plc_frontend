@@ -11,7 +11,9 @@ import {
   RollbackOutlined,
   ReloadOutlined,
   DatabaseOutlined,
-  FieldTimeOutlined
+  FieldTimeOutlined,
+  InfoCircleOutlined,
+  ExclamationCircleOutlined
 } from '@ant-design/icons';
 import Header from '../../components/layout/Header';
 import Sidebar from '../../components/layout/Sidebar';
@@ -26,9 +28,76 @@ import {
   deleteTimeSeriesColumn
 } from '../../services/api';
 
+// Tipos de dados disponíveis e suas descrições
+const DATA_TYPES = [
+  { value: 'text', label: 'Texto', description: 'Para dados textuais de qualquer tamanho', color: 'green' },
+  { value: 'varchar', label: 'VARCHAR', description: 'Texto com tamanho limitado', color: 'green' },
+  { value: 'char', label: 'CHAR', description: 'Texto com tamanho fixo', color: 'green' },
+  { value: 'integer', label: 'Inteiro', description: 'Números inteiros (-2147483648 a +2147483647)', color: 'blue' },
+  { value: 'bigint', label: 'BigInt', description: 'Números inteiros grandes', color: 'blue' },
+  { value: 'smallint', label: 'SmallInt', description: 'Números inteiros pequenos (-32768 a +32767)', color: 'blue' },
+  { value: 'float', label: 'Decimal', description: 'Números com ponto flutuante de precisão simples', color: 'purple' },
+  { value: 'real', label: 'Real', description: 'Números com ponto flutuante de precisão simples', color: 'purple' },
+  { value: 'double precision', label: 'Double', description: 'Números com ponto flutuante de precisão dupla', color: 'purple' },
+  { value: 'numeric', label: 'Numérico', description: 'Números decimais com precisão exata', color: 'purple' },
+  { value: 'boolean', label: 'Booleano', description: 'Valores verdadeiro/falso', color: 'yellow' },
+  { value: 'timestamp', label: 'Timestamp', description: 'Data e hora com precisão de microssegundos', color: 'red' },
+  { value: 'date', label: 'Data', description: 'Apenas data (sem hora)', color: 'red' },
+  { value: 'time', label: 'Hora', description: 'Apenas hora (sem data)', color: 'red' },
+  { value: 'json', label: 'JSON', description: 'Dados em formato JSON com validação', color: 'gray' },
+  { value: 'jsonb', label: 'JSONB', description: 'JSON binário para melhor performance', color: 'gray' }
+];
+
 interface LocationState {
   table?: TableMetadata;
 }
+
+interface DeleteModalProps {
+  column: ColumnMetadata;
+  visible: boolean;
+  onCancel: () => void;
+  onConfirm: () => void;
+}
+
+// Componente para o Modal de Confirmação de Exclusão
+const DeleteModal: React.FC<DeleteModalProps> = ({ column, visible, onCancel, onConfirm }) => {
+  if (!visible) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm" onClick={onCancel}></div>
+      <div className="bg-slate-800 rounded-xl border border-red-500/20 p-6 w-full max-w-md z-10">
+        <div className="flex items-center gap-3 mb-4">
+          <ExclamationCircleOutlined className="text-2xl text-red-500" />
+          <h3 className="text-xl font-bold text-white">Confirmar Exclusão</h3>
+        </div>
+        
+        <p className="text-gray-300 mb-2">
+          Tem certeza que deseja excluir a coluna <span className="text-red-400 font-semibold">{column.column_name}</span>?
+        </p>
+        <p className="text-gray-400 text-sm">
+          Esta ação não pode ser desfeita e todos os dados desta coluna serão perdidos.
+        </p>
+
+        <div className="mt-6 flex justify-end gap-3">
+          <button
+            onClick={onCancel}
+            className="px-4 py-2 text-gray-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={onConfirm}
+            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors flex items-center gap-2"
+          >
+            <DeleteOutlined />
+            Excluir
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const ColumnManager: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -40,6 +109,8 @@ const ColumnManager: React.FC = () => {
   const [columns, setColumns] = useState<ColumnMetadata[]>([]);
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [columnToDelete, setColumnToDelete] = useState<ColumnMetadata | null>(null);
   const [formData, setFormData] = useState({
     column_name: '',
     data_type: 'text',
@@ -51,13 +122,14 @@ const ColumnManager: React.FC = () => {
     data_type: ''
   });
   const [searchTerm, setSearchTerm] = useState('');
-
-  // Estados para layout padrão
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  
   const onLogout = () => {
-    // Implemente sua lógica de logout aqui
-    console.log('Logout acionado');
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('authUser');
+    navigate('/login');
   };
 
   const fetchTable = async () => {
@@ -103,11 +175,19 @@ const ColumnManager: React.FC = () => {
     let isValid = true;
     const errors = { column_name: '', data_type: '' };
 
+    // Validação do nome da coluna
     if (!formData.column_name.trim()) {
       errors.column_name = 'Por favor, informe o nome da coluna';
       isValid = false;
+    } else if (!/^[a-z][a-z0-9_]*$/.test(formData.column_name)) {
+      errors.column_name = 'Nome deve começar com letra e conter apenas letras minúsculas, números e underscore';
+      isValid = false;
+    } else if (columns.some(col => col.column_name === formData.column_name)) {
+      errors.column_name = 'Já existe uma coluna com este nome';
+      isValid = false;
     }
 
+    // Validação do tipo de dados
     if (!formData.data_type) {
       errors.data_type = 'Por favor, selecione o tipo de dados';
       isValid = false;
@@ -154,9 +234,12 @@ const ColumnManager: React.FC = () => {
     }
   };
 
+  const showDeleteConfirmation = (column: ColumnMetadata) => {
+    setColumnToDelete(column);
+    setDeleteModalVisible(true);
+  };
+
   const handleDeleteColumn = async (column: ColumnMetadata) => {
-    if (!window.confirm('Tem certeza que deseja excluir esta coluna?')) return;
-    
     try {
       if (!table) return;
       if (table.storage_type === 'permanent') {
@@ -165,6 +248,8 @@ const ColumnManager: React.FC = () => {
         await deleteTimeSeriesColumn(column.id);
       }
       message.success(`Coluna ${column.column_name} excluída com sucesso!`);
+      setDeleteModalVisible(false);
+      setColumnToDelete(null);
       fetchTable();
     } catch (error) {
       console.error('Erro ao excluir coluna:', error);
@@ -176,6 +261,16 @@ const ColumnManager: React.FC = () => {
     column.column_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (column.description && column.description.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+  const getDataTypeColor = (dataType: string) => {
+    const type = DATA_TYPES.find(t => t.value === dataType);
+    return type ? type.color : 'gray';
+  };
+
+  const getDataTypeLabel = (dataType: string) => {
+    const type = DATA_TYPES.find(t => t.value === dataType);
+    return type ? type.label : dataType;
+  };
 
   if (!table) {
     return (
@@ -245,17 +340,25 @@ const ColumnManager: React.FC = () => {
               <div className="flex gap-2 mt-3">
                 <button
                   onClick={showAddColumnModal}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm"
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105 shadow-lg hover:shadow-xl active:scale-95"
                 >
-                  <PlusOutlined />
-                  <span>Adicionar Coluna</span>
+                  <PlusOutlined className="text-lg" />
+                  <span className="font-medium">Adicionar Coluna</span>
+                  <span className="text-blue-200 text-xs ml-1">({columns.length})</span>
                 </button>
                 <button
                   onClick={() => navigate('/tables')}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors text-sm"
+                  className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all duration-200 ease-in-out"
                 >
                   <RollbackOutlined />
                   <span>Voltar</span>
+                </button>
+                <button
+                  onClick={fetchTable}
+                  className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all duration-200 ease-in-out"
+                  title="Atualizar lista"
+                >
+                  <ReloadOutlined />
                 </button>
               </div>
             </div>
@@ -310,24 +413,11 @@ const ColumnManager: React.FC = () => {
                         </tr>
                       ) : (
                         filteredColumns.map((column) => (
-                          <tr key={column.id} className="border-t border-slate-700/50">
+                          <tr key={column.id} className="border-t border-slate-700/50 hover:bg-slate-800/30">
                             <td className="px-4 py-3 text-white">{column.column_name}</td>
                             <td className="px-4 py-3">
-                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                column.data_type === 'text' ? 'bg-green-500/20 text-green-400' :
-                                column.data_type === 'integer' ? 'bg-blue-500/20 text-blue-400' :
-                                column.data_type === 'float' ? 'bg-purple-500/20 text-purple-400' :
-                                column.data_type === 'boolean' ? 'bg-yellow-500/20 text-yellow-400' :
-                                column.data_type === 'timestamp' ? 'bg-red-500/20 text-red-400' :
-                                'bg-gray-500/20 text-gray-400'
-                              }`}>
-                                {column.data_type === 'text' ? 'Texto' :
-                                column.data_type === 'integer' ? 'Inteiro' :
-                                column.data_type === 'float' ? 'Decimal' :
-                                column.data_type === 'boolean' ? 'Booleano' :
-                                column.data_type === 'timestamp' ? 'Timestamp' :
-                                column.data_type === 'json' ? 'JSON' :
-                                column.data_type}
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium bg-${getDataTypeColor(column.data_type)}-500/20 text-${getDataTypeColor(column.data_type)}-400`}>
+                                {getDataTypeLabel(column.data_type)}
                               </span>
                             </td>
                             <td className="px-4 py-3 text-gray-300">{column.description || '-'}</td>
@@ -350,8 +440,8 @@ const ColumnManager: React.FC = () => {
                             <td className="px-4 py-3">
                               <div className="flex justify-end">
                                 <button
-                                  onClick={() => handleDeleteColumn(column)}
-                                  className="flex items-center gap-1 p-1 text-red-400 hover:bg-slate-700 rounded transition-colors"
+                                  onClick={() => showDeleteConfirmation(column)}
+                                  className="flex items-center gap-1 p-2 text-red-400 hover:bg-red-500/10 rounded transition-colors"
                                   title="Excluir Coluna"
                                 >
                                   <DeleteOutlined />
@@ -368,7 +458,10 @@ const ColumnManager: React.FC = () => {
               
               {/* Paginação */}
               {filteredColumns.length > 0 && (
-                <div className="py-2 px-4 border-t border-slate-700 flex justify-end mt-2">
+                <div className="py-2 px-4 border-t border-slate-700 flex justify-between items-center mt-2">
+                  <div className="text-sm text-gray-400">
+                    Total: {filteredColumns.length} coluna(s)
+                  </div>
                   <div className="text-sm text-gray-400">
                     <span className="px-2 py-1 bg-slate-700 text-gray-300 rounded-md">1</span>
                   </div>
@@ -416,8 +509,22 @@ const ColumnManager: React.FC = () => {
                   </div>
 
                   <div>
-                    <label htmlFor="data_type" className="block text-sm font-medium text-gray-400 mb-1">
+                    <label htmlFor="data_type" className="block text-sm font-medium text-gray-400 mb-1 flex items-center gap-2">
                       Tipo de Dados
+                      <div className="group relative">
+                        <InfoCircleOutlined className="text-gray-500 cursor-help" />
+                        <div className="absolute hidden group-hover:block top-full left-0 mt-2 w-64 p-3 bg-slate-900 rounded-lg shadow-xl z-50 border border-slate-700">
+                          <h4 className="font-semibold mb-2 text-white">Tipos de Dados:</h4>
+                          <div className="space-y-2">
+                            {DATA_TYPES.map(type => (
+                              <div key={type.value} className="text-xs">
+                                <span className={`text-${type.color}-400 font-medium`}>{type.label}:</span>
+                                <span className="text-gray-400 ml-1">{type.description}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
                     </label>
                     <select
                       id="data_type"
@@ -428,12 +535,11 @@ const ColumnManager: React.FC = () => {
                         formErrors.data_type ? 'border-red-500' : 'border-slate-600'
                       } rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 transition-colors`}
                     >
-                      <option value="text">Texto</option>
-                      <option value="integer">Inteiro</option>
-                      <option value="float">Decimal</option>
-                      <option value="boolean">Booleano</option>
-                      <option value="timestamp">Timestamp</option>
-                      <option value="json">JSON</option>
+                      {DATA_TYPES.map(type => (
+                        <option key={type.value} value={type.value}>
+                          {type.label}
+                        </option>
+                      ))}
                     </select>
                     {formErrors.data_type && (
                       <p className="mt-1 text-sm text-red-500">{formErrors.data_type}</p>
@@ -473,24 +579,56 @@ const ColumnManager: React.FC = () => {
                     </div>
                   )}
 
+                  {/* Preview da coluna */}
+                  <div className="mt-6 p-4 bg-slate-700/50 rounded-lg">
+                    <h4 className="text-sm font-medium text-gray-400 mb-2">Preview da Coluna:</h4>
+                    <div className="bg-slate-800 p-3 rounded border border-slate-600">
+                      <code className="text-sm">
+                        <span className="text-blue-400">{formData.column_name || 'nome_coluna'}</span>
+                        <span className="text-gray-400"> </span>
+                        <span className="text-green-400">{formData.data_type}</span>
+                        {formData.description && (
+                          <>
+                            <span className="text-gray-400"> -- </span>
+                            <span className="text-gray-500">{formData.description}</span>
+                          </>
+                        )}
+                      </code>
+                    </div>
+                  </div>
+
                   <div className="flex justify-end gap-3 mt-6">
                     <button
                       type="button"
                       onClick={() => setModalVisible(false)}
-                      className="px-4 py-2 text-gray-400 hover:text-white hover:bg-slate-700 rounded-lg transition-colors"
+                      className="px-4 py-2 text-gray-400 hover:text-white hover:bg-slate-700 rounded-lg transition-all duration-200 ease-in-out"
                     >
                       Cancelar
                     </button>
                     <button
                       type="submit"
-                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 ease-in-out transform hover:scale-105 active:scale-95 flex items-center gap-2"
                     >
+                      <PlusOutlined />
                       Adicionar
                     </button>
                   </div>
                 </form>
               </div>
             </div>
+          )}
+
+          {/* Modal de confirmação de exclusão */}
+          {deleteModalVisible && columnToDelete && (
+            <DeleteModal
+              column={columnToDelete}
+              visible={deleteModalVisible}
+              onCancel={() => {
+                setDeleteModalVisible(false);
+                setColumnToDelete(null);
+              }}
+              onConfirm={() => handleDeleteColumn(columnToDelete)}
+            />
           )}
         </main>
       </div>

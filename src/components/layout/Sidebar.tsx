@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Database, Activity, Users, Ship, LogOut, Menu, Table2 } from 'lucide-react';
+import { LayoutDashboard, Database, Activity, Users, Ship, LogOut, Menu, Table2, Cpu } from 'lucide-react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -14,66 +14,106 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, onLogout }) =>
   const menuItems = [
     { icon: <LayoutDashboard className="w-5 h-5" />, text: 'Dashboard', path: '/' },
     { icon: <Database className="w-5 h-5" />, text: 'PLCs', path: '/plcs' },
-    { icon: <Activity className="w-5 h-5" />, text: 'Monitoramento', path: '/plcmonitor' },
+    { icon: <Activity className="w-5 h-5" />, text: 'Monitoramento', path: '/monitoramento' }, // Atualizado aqui
     { icon: <Table2 className="w-5 h-5" />, text: 'Tabelas', path: '/tables' },
     { icon: <Users className="w-5 h-5" />, text: 'Usuários', path: '/admin/users' },
     { icon: <Ship className="w-5 h-5" />, text: 'Painel Eclusa', path: '/painel-eclusa' },
   ];
-  
+
   return (
     <aside
-      className={`bg-slate-800 min-h-screen p-4 flex flex-col transition-all duration-300 border-r border-slate-700 ${
-        isOpen ? 'w-64' : 'w-20'
+      className={`bg-slate-800/80 backdrop-blur-xl border-r border-slate-700/50 transition-all duration-300 ease-in-out ${
+        isOpen ? 'w-72' : 'w-20'
       }`}
     >
-      {/* Container do cabeçalho */}
-      <div className={`flex items-center mb-8 ${isOpen ? 'justify-between' : 'justify-center'}`}>
-        {isOpen && (
-          <span className="text-xl font-bold bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
-            PLC Collector
-          </span>
-        )}
-        <button onClick={toggleSidebar} className="text-gray-400 hover:text-white focus:outline-none transition-colors">
-          <Menu className="w-6 h-6" />
-        </button>
-      </div>
-      
-      <nav className="flex-1">
-        <ul className="space-y-2">
+      <div className="flex flex-col h-screen p-4">
+        {/* Logo */}
+        <div className={`flex items-center ${isOpen ? 'justify-between' : 'justify-center'} mb-8`}>
+          {isOpen && (
+            <div className="flex items-center gap-3">
+              <div className="relative group">
+                <div className="absolute -inset-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl blur opacity-40 group-hover:opacity-60 transition duration-500" />
+                <div className="relative bg-gradient-to-r from-blue-500 to-purple-500 p-[2px] rounded-xl">
+                  <div className="bg-slate-800 p-2 rounded-xl">
+                    <Cpu className="w-6 h-6 text-blue-400" />
+                  </div>
+                </div>
+              </div>
+              <span className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+                PLC Collector
+              </span>
+            </div>
+          )}
+          <button 
+            onClick={toggleSidebar}
+            className="p-2 rounded-xl hover:bg-slate-700/50 text-slate-400 hover:text-blue-400 transition-all duration-300"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Menu */}
+        <nav className="flex-1 space-y-2">
           {menuItems.map((item, index) => {
-            const isActive = location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
+            const isActive = location.pathname === item.path;
             return (
-              <li key={index}>
-                <Link
-                  to={item.path}
-                  className={`flex items-center p-2 rounded-lg transition-all duration-200 ${
-                    isActive ? 'bg-slate-700 text-white' : 'text-gray-400 hover:text-white hover:bg-slate-700'
-                  }`}
-                >
-                  <span
-                    className={`flex items-center justify-center ${
-                      isOpen ? 'p-2 rounded-lg bg-slate-700 group-hover:bg-slate-600' : 'w-full'
-                    }`}
-                  >
+              <Link
+                key={index}
+                to={item.path}
+                className={`flex items-center gap-3 p-2 rounded-xl group transition-all duration-300 ${
+                  isActive 
+                    ? 'bg-gradient-to-r from-blue-500/10 to-purple-500/10 relative' 
+                    : 'hover:bg-slate-700/50'
+                }`}
+              >
+                {/* Ícone */}
+                <div className={`relative ${isActive ? 'group/icon' : ''}`}>
+                  {isActive && (
+                    <div className="absolute -inset-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl blur opacity-40 group-hover/icon:opacity-60 transition duration-500" />
+                  )}
+                  <div className={`relative p-2 rounded-xl transition-all duration-300 ${
+                    isActive 
+                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white' 
+                      : 'text-slate-400 group-hover:text-blue-400'
+                  }`}>
                     {item.icon}
+                  </div>
+                </div>
+
+                {/* Texto */}
+                {isOpen && (
+                  <span className={`transition-colors duration-300 ${
+                    isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-200'
+                  }`}>
+                    {item.text}
                   </span>
-                  {isOpen && <span className="ml-3">{item.text}</span>}
-                </Link>
-              </li>
+                )}
+
+                {/* Indicador de ativo */}
+                {isActive && (
+                  <div className="absolute right-2 w-1.5 h-1.5 rounded-full bg-gradient-to-r from-blue-400 to-purple-400" />
+                )}
+              </Link>
             );
           })}
-        </ul>
-      </nav>
-      
-      <div className="mt-auto pt-4 border-t border-slate-700">
+        </nav>
+
+        {/* Botão de Logout */}
         <button
           onClick={onLogout}
-          className="flex items-center w-full px-3 py-2 text-red-400 hover:text-red-300 hover:bg-slate-700 rounded-lg transition-all duration-200"
+          className="flex items-center gap-3 p-2 rounded-xl group hover:bg-red-500/10 transition-all duration-300"
         >
-          <span className="p-2 rounded-lg bg-slate-700">
-            <LogOut className="w-5 h-5" />
-          </span>
-          {isOpen && <span className="ml-3">Sair</span>}
+          <div className="relative group/icon">
+            <div className="absolute -inset-2 bg-gradient-to-r from-red-500 to-pink-500 rounded-xl blur opacity-0 group-hover/icon:opacity-40 transition duration-500" />
+            <div className="relative p-2 rounded-xl text-red-400 group-hover:text-red-300 transition-colors duration-300">
+              <LogOut className="w-5 h-5" />
+            </div>
+          </div>
+          {isOpen && (
+            <span className="text-red-400 group-hover:text-red-300 transition-colors duration-300">
+              Sair
+            </span>
+          )}
         </button>
       </div>
     </aside>

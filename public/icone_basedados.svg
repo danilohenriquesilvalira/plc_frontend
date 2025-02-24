@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Fundo circular atualizado para um design mais moderno -->
+  <circle cx="32" cy="32" r="30" fill="#2196F3" stroke="#1565C0" stroke-width="3" />
+  
+  <!-- Ícone estilizado para representar coleta e armazenamento -->
+  <rect x="14" y="22" width="36" height="20" rx="5" ry="5" fill="#FFF" stroke="#0D47A1" stroke-width="3" />
+  <line x1="14" y1="30" x2="50" y2="30" stroke="#0D47A1" stroke-width="3" />
+  
+  <!-- Pontos de coleta modernos -->
+  <circle cx="22" cy="38" r="3" fill="#0D47A1" />
+  <circle cx="32" cy="38" r="3" fill="#0D47A1" />
+  <circle cx="42" cy="38" r="3" fill="#0D47A1" />
+  
+  <!-- Tampa do armazenamento -->
+  <rect x="18" y="16" width="28" height="6" rx="2" ry="2" fill="#0D47A1" stroke="#0D47A1" stroke-width="2" />
+</svg>
