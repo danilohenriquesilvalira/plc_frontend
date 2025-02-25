@@ -12,7 +12,8 @@ import {
   TrendingUp, 
   Activity, 
   AlertCircle,
-  Clock
+  Clock,
+  ChevronRight
 } from 'lucide-react';
 import { 
   connectMonitoringWebSocket, 
@@ -42,21 +43,39 @@ const MetricCard: React.FC<MetricCardProps> = ({ title, value, icon, trend, stat
     offline: "text-gray-500"
   };
 
+  const statusBackgrounds: Record<StatusType, string> = {
+    normal: "bg-green-500/10",
+    warning: "bg-yellow-500/10",
+    critical: "bg-red-500/10",
+    error: "bg-red-500/10",
+    offline: "bg-gray-500/10"
+  };
+
+  const statusLabels: Record<StatusType, string> = {
+    normal: "Normal",
+    warning: "Atenção",
+    critical: "Crítico",
+    error: "Erro",
+    offline: "Offline"
+  };
+
   return (
-    <Card className="bg-slate-800 border-slate-700">
+    <Card className="bg-gradient-to-br from-slate-800 to-slate-700/90 border-slate-600 hover:border-blue-500/50 shadow-lg transition-all duration-300">
       <CardContent className="p-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            {icon}
+          <div className="flex items-center space-x-3">
+            <div className="p-2 rounded-lg bg-blue-500/10">
+              {icon}
+            </div>
             <h3 className="text-sm font-medium text-slate-200">{title}</h3>
           </div>
-          <span className={`${statusColors[status]} text-xs px-2 py-1 rounded-full bg-opacity-10 bg-current`}>
-            {status === "normal" ? "Normal" : status === "warning" ? "Atenção" : status === "critical" ? "Crítico" : status === "error" ? "Erro" : "Offline"}
+          <span className={`${statusColors[status]} ${statusBackgrounds[status]} text-xs px-2 py-1 rounded-full font-medium`}>
+            {statusLabels[status]}
           </span>
         </div>
-        <div className="mt-3">
+        <div className="mt-4">
           <div className="text-2xl font-bold text-white">{value}</div>
-          <div className="text-xs text-slate-400 mt-1 flex items-center">
+          <div className="text-xs text-slate-400 mt-2 flex items-center">
             <span className={`mr-1 ${trend > 0 ? 'text-green-400' : 'text-red-400'}`}>
               {trend > 0 ? '↑' : '↓'} {Math.abs(trend)}%
             </span>
@@ -138,6 +157,14 @@ const Monitoramento: React.FC = () => {
     };
   }, []);
 
+  // Função para renderizar informações do sistema
+  const renderSystemInfo = (title: string, value: string, last = false) => (
+    <div className={`flex justify-between ${!last ? 'border-b border-slate-700/50 pb-3 mb-3' : ''}`}>
+      <span className="text-slate-400">{title}</span>
+      <span className="text-white font-medium">{value}</span>
+    </div>
+  );
+
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-slate-900">
       <Sidebar 
@@ -151,50 +178,50 @@ const Monitoramento: React.FC = () => {
           title="Monitoramento do Sistema" 
         />
         <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-x-hidden overflow-y-auto">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6">
-            <div>
-              <p className="text-slate-400 mt-1">Métricas em tempo real de todos os componentes</p>
-            </div>
-            <div className="mt-4 sm:mt-0 flex items-center space-x-3">
-              <span className={`${connected ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'} px-3 py-1 rounded-full text-xs font-medium flex items-center`}>
-                <Activity className="w-3 h-3 mr-1" />
-                {connected ? 'Coletando dados' : 'Desconectado'}
-              </span>
-              {lastUpdate && (
-                <span className="text-slate-300 text-sm">
-                  <Clock className="inline-block w-4 h-4 mr-1" />
-                  Atualizado há {Math.floor((new Date().getTime() - lastUpdate.getTime()) / 1000)}s
-                </span>
-              )}
+          {/* Nova barra de navegação com botões maiores que ocupam toda a largura */}
+          <div className="bg-slate-800 rounded-xl shadow-lg overflow-hidden mb-6 border border-slate-700">
+            <div className="grid grid-cols-5">
+              <button 
+                onClick={() => setActiveTab("servidor")}
+                className={`flex items-center justify-center py-5 ${activeTab === "servidor" ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-700'} transition-colors duration-200`}
+              >
+                <Server className="w-6 h-6 mr-2" />
+                <span className="font-medium">Servidor</span>
+              </button>
+              <button 
+                onClick={() => setActiveTab("postgresql")}
+                className={`flex items-center justify-center py-5 ${activeTab === "postgresql" ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-700'} transition-colors duration-200`}
+              >
+                <Database className="w-6 h-6 mr-2" />
+                <span className="font-medium">PostgreSQL</span>
+              </button>
+              <button 
+                onClick={() => setActiveTab("timescaledb")}
+                className={`flex items-center justify-center py-5 ${activeTab === "timescaledb" ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-700'} transition-colors duration-200`}
+              >
+                <Clock className="w-6 h-6 mr-2" />
+                <span className="font-medium">TimescaleDB</span>
+              </button>
+              <button 
+                onClick={() => setActiveTab("redis")}
+                className={`flex items-center justify-center py-5 ${activeTab === "redis" ? 'bg-blue-600 text-white' : 'text-slate-300 hover:bg-slate-700'} transition-colors duration-200`}
+              >
+                <Activity className="w-6 h-6 mr-2" />
+                <span className="font-medium">Redis</span>
+              </button>
+              <button 
+                onClick={() => setActiveTab("mariadb")}
+                className={`flex items-center justify-center py-5 ${activeTab === "mariadb" ? 'bg-cyan-600 text-white' : 'text-slate-300 hover:bg-slate-700'} transition-colors duration-200`}
+              >
+                <Database className="w-6 h-6 mr-2" />
+                <span className="font-medium">MariaDB</span>
+              </button>
             </div>
           </div>
 
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="bg-slate-800 border-slate-700">
-              <TabsTrigger value="servidor" className="data-[state=active]:bg-blue-600">
-                <Server className="w-4 h-4 mr-2" />
-                Servidor
-              </TabsTrigger>
-              <TabsTrigger value="postgresql" className="data-[state=active]:bg-blue-600">
-                <Database className="w-4 h-4 mr-2" />
-                PostgreSQL
-              </TabsTrigger>
-              <TabsTrigger value="timescaledb" className="data-[state=active]:bg-blue-600">
-                <Clock className="w-4 h-4 mr-2" />
-                TimescaleDB
-              </TabsTrigger>
-              <TabsTrigger value="redis" className="data-[state=active]:bg-blue-600">
-                <Activity className="w-4 h-4 mr-2" />
-                Redis
-              </TabsTrigger>
-              <TabsTrigger value="mariadb" className="data-[state=active]:bg-blue-600">
-                <Database className="w-4 h-4 mr-2" />
-                MariaDB
-              </TabsTrigger>
-            </TabsList>
-
-            {/* Aba do Servidor */}
-            <TabsContent value="servidor" className="mt-4">
+          {/* Aba do Servidor */}
+          {activeTab === "servidor" && (
+            <>
               {serverMetrics ? (
                 <>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -222,57 +249,39 @@ const Monitoramento: React.FC = () => {
                   </div>
                   
                   <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <Card className="bg-slate-800 border-slate-700">
+                    <Card className="bg-gradient-to-br from-slate-800 to-slate-700/90 border-slate-600 hover:border-blue-500/50 shadow-lg transition-all duration-300">
                       <CardHeader className="pb-0">
-                        <CardTitle className="text-slate-100">Informações do Sistema</CardTitle>
+                        <CardTitle className="text-slate-100 flex items-center">
+                          <Server className="w-5 h-5 mr-2 text-blue-500" />
+                          Informações do Sistema
+                        </CardTitle>
                       </CardHeader>
                       <CardContent className="pt-4">
                         <div className="space-y-3">
-                          <div className="flex justify-between border-b border-slate-700 pb-2">
-                            <span className="text-slate-400">Hostname</span>
-                            <span className="text-white">{serverMetrics.system.hostname}</span>
-                          </div>
-                          <div className="flex justify-between border-b border-slate-700 pb-2">
-                            <span className="text-slate-400">Sistema</span>
-                            <span className="text-white">{serverMetrics.system.platform}</span>
-                          </div>
-                          <div className="flex justify-between border-b border-slate-700 pb-2">
-                            <span className="text-slate-400">Uptime</span>
-                            <span className="text-white">{formatUptime(serverMetrics.system.uptime)}</span>
-                          </div>
-                          <div className="flex justify-between border-b border-slate-700 pb-2">
-                            <span className="text-slate-400">Memória Total</span>
-                            <span className="text-white">{formatBytes(serverMetrics.memory.total)}</span>
-                          </div>
-                          <div className="flex justify-between border-b border-slate-700 pb-2">
-                            <span className="text-slate-400">Memória Usada</span>
-                            <span className="text-white">{formatBytes(serverMetrics.memory.used)}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-slate-400">Processos</span>
-                            <span className="text-white">{serverMetrics.system.processes}</span>
-                          </div>
+                          {renderSystemInfo("Hostname", serverMetrics.system.hostname)}
+                          {renderSystemInfo("Sistema", serverMetrics.system.platform)}
+                          {renderSystemInfo("Uptime", formatUptime(serverMetrics.system.uptime))}
+                          {renderSystemInfo("Memória Total", formatBytes(serverMetrics.memory.total))}
+                          {renderSystemInfo("Memória Usada", formatBytes(serverMetrics.memory.used))}
+                          {renderSystemInfo("Processos", serverMetrics.system.processes.toString(), true)}
                         </div>
                       </CardContent>
                     </Card>
                     
-                    <Card className="bg-slate-800 border-slate-700">
+                    <Card className="bg-gradient-to-br from-slate-800 to-slate-700/90 border-slate-600 hover:border-blue-500/50 shadow-lg transition-all duration-300">
                       <CardHeader className="pb-0">
-                        <CardTitle className="text-slate-100">Rede</CardTitle>
+                        <CardTitle className="text-slate-100 flex items-center">
+                          <Activity className="w-5 h-5 mr-2 text-purple-500" />
+                          Rede
+                        </CardTitle>
                       </CardHeader>
                       <CardContent className="pt-4">
                         <div className="space-y-3">
-                          <div className="flex justify-between border-b border-slate-700 pb-2">
-                            <span className="text-slate-400">Dados Enviados</span>
-                            <span className="text-white">{formatBytes(serverMetrics.network.bytesSent)}</span>
-                          </div>
-                          <div className="flex justify-between border-b border-slate-700 pb-2">
-                            <span className="text-slate-400">Dados Recebidos</span>
-                            <span className="text-white">{formatBytes(serverMetrics.network.bytesReceived)}</span>
-                          </div>
+                          {renderSystemInfo("Dados Enviados", formatBytes(serverMetrics.network.bytesSent))}
+                          {renderSystemInfo("Dados Recebidos", formatBytes(serverMetrics.network.bytesReceived))}
                           <div className="flex justify-between">
                             <span className="text-slate-400">Status</span>
-                            <span className={`${serverMetrics.network.status === 'normal' ? 'text-green-400' : 'text-yellow-400'}`}>
+                            <span className={`${serverMetrics.network.status === 'normal' ? 'text-green-400' : 'text-yellow-400'} font-medium`}>
                               {serverMetrics.network.status === 'normal' ? 'Normal' : 'Atenção'}
                             </span>
                           </div>
@@ -282,14 +291,19 @@ const Monitoramento: React.FC = () => {
                   </div>
                 </>
               ) : (
-                <div className="flex justify-center items-center h-64">
-                  <div className="text-slate-400">Carregando métricas do servidor...</div>
+                <div className="flex justify-center items-center h-64 bg-slate-800/30 rounded-xl border border-slate-700/50">
+                  <div className="text-slate-400 flex flex-col items-center">
+                    <Activity className="w-10 h-10 mb-3 text-blue-400 animate-pulse" />
+                    <span>Carregando métricas do servidor...</span>
+                  </div>
                 </div>
               )}
-            </TabsContent>
+            </>
+          )}
 
-            {/* Aba do PostgreSQL */}
-            <TabsContent value="postgresql" className="mt-4">
+          {/* Aba do PostgreSQL */}
+          {activeTab === "postgresql" && (
+            <>
               {databaseMetrics?.postgresql ? (
                 <>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -317,19 +331,19 @@ const Monitoramento: React.FC = () => {
                   </div>
                   
                   <div className="mt-6">
-                    <Card className="bg-slate-800 border-slate-700">
+                    <Card className="bg-gradient-to-br from-slate-800 to-slate-700/90 border-slate-600 hover:border-blue-500/50 shadow-lg transition-all duration-300">
                       <CardHeader className="pb-0">
-                        <CardTitle className="text-slate-100">Detalhes do PostgreSQL</CardTitle>
+                        <CardTitle className="text-slate-100 flex items-center">
+                          <Database className="w-5 h-5 mr-2 text-blue-500" />
+                          Detalhes do PostgreSQL
+                        </CardTitle>
                       </CardHeader>
                       <CardContent className="pt-4">
                         <div className="space-y-3">
-                          <div className="flex justify-between border-b border-slate-700 pb-2">
-                            <span className="text-slate-400">Tamanho do Banco</span>
-                            <span className="text-white">{formatBytes(databaseMetrics.postgresql.size)}</span>
-                          </div>
-                          <div className="flex justify-between border-b border-slate-700 pb-2">
+                          {renderSystemInfo("Tamanho do Banco", formatBytes(databaseMetrics.postgresql.size))}
+                          <div className="flex justify-between">
                             <span className="text-slate-400">Status</span>
-                            <span className={`${databaseMetrics.postgresql.status === 'online' ? 'text-green-400' : 'text-red-400'}`}>
+                            <span className={`${databaseMetrics.postgresql.status === 'online' ? 'text-green-400' : 'text-red-400'} font-medium`}>
                               {databaseMetrics.postgresql.status === 'online' ? 'Online' : 'Offline'}
                             </span>
                           </div>
@@ -339,14 +353,19 @@ const Monitoramento: React.FC = () => {
                   </div>
                 </>
               ) : (
-                <div className="flex justify-center items-center h-64">
-                  <div className="text-slate-400">Carregando métricas do PostgreSQL...</div>
+                <div className="flex justify-center items-center h-64 bg-slate-800/30 rounded-xl border border-slate-700/50">
+                  <div className="text-slate-400 flex flex-col items-center">
+                    <Database className="w-10 h-10 mb-3 text-blue-400 animate-pulse" />
+                    <span>Carregando métricas do PostgreSQL...</span>
+                  </div>
                 </div>
               )}
-            </TabsContent>
+            </>
+          )}
 
-            {/* Aba do TimescaleDB */}
-            <TabsContent value="timescaledb" className="mt-4">
+          {/* Aba do TimescaleDB */}
+          {activeTab === "timescaledb" && (
+            <>
               {databaseMetrics?.timescaledb ? (
                 <>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -374,19 +393,19 @@ const Monitoramento: React.FC = () => {
                   </div>
                   
                   <div className="mt-6">
-                    <Card className="bg-slate-800 border-slate-700">
+                    <Card className="bg-gradient-to-br from-slate-800 to-slate-700/90 border-slate-600 hover:border-blue-500/50 shadow-lg transition-all duration-300">
                       <CardHeader className="pb-0">
-                        <CardTitle className="text-slate-100">Detalhes do TimescaleDB</CardTitle>
+                        <CardTitle className="text-slate-100 flex items-center">
+                          <Clock className="w-5 h-5 mr-2 text-blue-500" />
+                          Detalhes do TimescaleDB
+                        </CardTitle>
                       </CardHeader>
                       <CardContent className="pt-4">
                         <div className="space-y-3">
-                          <div className="flex justify-between border-b border-slate-700 pb-2">
-                            <span className="text-slate-400">Tamanho do Banco</span>
-                            <span className="text-white">{formatBytes(databaseMetrics.timescaledb.size)}</span>
-                          </div>
-                          <div className="flex justify-between border-b border-slate-700 pb-2">
+                          {renderSystemInfo("Tamanho do Banco", formatBytes(databaseMetrics.timescaledb.size))}
+                          <div className="flex justify-between">
                             <span className="text-slate-400">Status</span>
-                            <span className={`${databaseMetrics.timescaledb.status === 'online' ? 'text-green-400' : 'text-red-400'}`}>
+                            <span className={`${databaseMetrics.timescaledb.status === 'online' ? 'text-green-400' : 'text-red-400'} font-medium`}>
                               {databaseMetrics.timescaledb.status === 'online' ? 'Online' : 'Offline'}
                             </span>
                           </div>
@@ -396,14 +415,19 @@ const Monitoramento: React.FC = () => {
                   </div>
                 </>
               ) : (
-                <div className="flex justify-center items-center h-64">
-                  <div className="text-slate-400">Carregando métricas do TimescaleDB...</div>
+                <div className="flex justify-center items-center h-64 bg-slate-800/30 rounded-xl border border-slate-700/50">
+                  <div className="text-slate-400 flex flex-col items-center">
+                    <Clock className="w-10 h-10 mb-3 text-blue-400 animate-pulse" />
+                    <span>Carregando métricas do TimescaleDB...</span>
+                  </div>
                 </div>
               )}
-            </TabsContent>
+            </>
+          )}
 
-            {/* Aba do Redis */}
-            <TabsContent value="redis" className="mt-4">
+          {/* Aba do Redis */}
+          {activeTab === "redis" && (
+            <>
               {databaseMetrics?.redis ? (
                 <>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -431,23 +455,20 @@ const Monitoramento: React.FC = () => {
                   </div>
                   
                   <div className="mt-6">
-                    <Card className="bg-slate-800 border-slate-700">
+                    <Card className="bg-gradient-to-br from-slate-800 to-slate-700/90 border-slate-600 hover:border-blue-500/50 shadow-lg transition-all duration-300">
                       <CardHeader className="pb-0">
-                        <CardTitle className="text-slate-100">Detalhes do Redis</CardTitle>
+                        <CardTitle className="text-slate-100 flex items-center">
+                          <Activity className="w-5 h-5 mr-2 text-red-400" />
+                          Detalhes do Redis
+                        </CardTitle>
                       </CardHeader>
                       <CardContent className="pt-4">
                         <div className="space-y-3">
-                          <div className="flex justify-between border-b border-slate-700 pb-2">
-                            <span className="text-slate-400">Memória Alocada</span>
-                            <span className="text-white">{formatBytes(databaseMetrics.redis.memory)}</span>
-                          </div>
-                          <div className="flex justify-between border-b border-slate-700 pb-2">
-                            <span className="text-slate-400">Total de Chaves</span>
-                            <span className="text-white">{databaseMetrics.redis.keyCount.toLocaleString()}</span>
-                          </div>
-                          <div className="flex justify-between border-b border-slate-700 pb-2">
+                          {renderSystemInfo("Memória Alocada", formatBytes(databaseMetrics.redis.memory))}
+                          {renderSystemInfo("Total de Chaves", databaseMetrics.redis.keyCount.toLocaleString())}
+                          <div className="flex justify-between">
                             <span className="text-slate-400">Status</span>
-                            <span className={`${databaseMetrics.redis.status === 'online' ? 'text-green-400' : 'text-red-400'}`}>
+                            <span className={`${databaseMetrics.redis.status === 'online' ? 'text-green-400' : 'text-red-400'} font-medium`}>
                               {databaseMetrics.redis.status === 'online' ? 'Online' : 'Offline'}
                             </span>
                           </div>
@@ -457,14 +478,19 @@ const Monitoramento: React.FC = () => {
                   </div>
                 </>
               ) : (
-                <div className="flex justify-center items-center h-64">
-                  <div className="text-slate-400">Carregando métricas do Redis...</div>
+                <div className="flex justify-center items-center h-64 bg-slate-800/30 rounded-xl border border-slate-700/50">
+                  <div className="text-slate-400 flex flex-col items-center">
+                    <Activity className="w-10 h-10 mb-3 text-red-400 animate-pulse" />
+                    <span>Carregando métricas do Redis...</span>
+                  </div>
                 </div>
               )}
-            </TabsContent>
+            </>
+          )}
 
-            {/* Aba do MariaDB */}
-            <TabsContent value="mariadb" className="mt-4">
+          {/* Aba do MariaDB */}
+          {activeTab === "mariadb" && (
+            <>
               {databaseMetrics?.mariadb ? (
                 <>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -492,23 +518,20 @@ const Monitoramento: React.FC = () => {
                   </div>
                   
                   <div className="mt-6">
-                    <Card className="bg-slate-800 border-slate-700">
+                    <Card className="bg-gradient-to-br from-slate-800 to-slate-700/90 border-slate-600 hover:border-blue-500/50 shadow-lg transition-all duration-300">
                       <CardHeader className="pb-0">
-                        <CardTitle className="text-slate-100">Detalhes do MariaDB</CardTitle>
+                        <CardTitle className="text-slate-100 flex items-center">
+                          <Database className="w-5 h-5 mr-2 text-blue-500" />
+                          Detalhes do MariaDB
+                        </CardTitle>
                       </CardHeader>
                       <CardContent className="pt-4">
                         <div className="space-y-3">
-                          <div className="flex justify-between border-b border-slate-700 pb-2">
-                            <span className="text-slate-400">Tamanho do Banco</span>
-                            <span className="text-white">{formatBytes(databaseMetrics.mariadb.size)}</span>
-                          </div>
-                          <div className="flex justify-between border-b border-slate-700 pb-2">
-                            <span className="text-slate-400">Queries por Segundo</span>
-                            <span className="text-white">{databaseMetrics.mariadb.queriesPerSec.toFixed(1)}</span>
-                          </div>
-                          <div className="flex justify-between border-b border-slate-700 pb-2">
+                          {renderSystemInfo("Tamanho do Banco", formatBytes(databaseMetrics.mariadb.size))}
+                          {renderSystemInfo("Queries por Segundo", databaseMetrics.mariadb.queriesPerSec.toFixed(1))}
+                          <div className="flex justify-between">
                             <span className="text-slate-400">Status</span>
-                            <span className={`${databaseMetrics.mariadb.status === 'online' ? 'text-green-400' : 'text-red-400'}`}>
+                            <span className={`${databaseMetrics.mariadb.status === 'online' ? 'text-green-400' : 'text-red-400'} font-medium`}>
                               {databaseMetrics.mariadb.status === 'online' ? 'Online' : 'Offline'}
                             </span>
                           </div>
@@ -518,12 +541,15 @@ const Monitoramento: React.FC = () => {
                   </div>
                 </>
               ) : (
-                <div className="flex justify-center items-center h-64">
-                  <div className="text-slate-400">Carregando métricas do MariaDB...</div>
+                <div className="flex justify-center items-center h-64 bg-slate-800/30 rounded-xl border border-slate-700/50">
+                  <div className="text-slate-400 flex flex-col items-center">
+                    <Database className="w-10 h-10 mb-3 text-blue-400 animate-pulse" />
+                    <span>Carregando métricas do MariaDB...</span>
+                  </div>
                 </div>
               )}
-            </TabsContent>
-          </Tabs>
+            </>
+          )}
         </main>
       </div>
     </div>
