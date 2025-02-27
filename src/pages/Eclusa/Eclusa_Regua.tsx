@@ -7,9 +7,9 @@ import { useAuth } from '../../contexts/AuthContext';
 import Caldeira from '../../components/eclusa/Caldeira';
 import Caldeira1 from '../../components/eclusa/Caldeira1';
 import Nivel from '../../components/eclusa/Nivel';
-import Semafaro from '../../components/eclusa/semafaro';
+import Semafaro from '../../components/eclusa/Semafaro';
 import PortaJusante from '../../components/eclusa/PortaJusante';
-import PortaMontante from '../../components/eclusa/PortaMontante'; // ✅ Nova porta adicionada
+import PortaMontante from '../../components/eclusa/PortaMontante';
 
 const Eclusa_Regua: React.FC = () => {
   const { logout } = useAuth();
@@ -17,6 +17,9 @@ const Eclusa_Regua: React.FC = () => {
   
   // Estado para o nível da água (0-100%)
   const [nivelAgua, setNivelAgua] = useState(30);
+  
+  // Estado para controlar a abertura da porta jusante nova
+  const [portaJusanteAberta, setPortaJusanteAberta] = useState(false);
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-slate-950">
@@ -61,6 +64,27 @@ const Eclusa_Regua: React.FC = () => {
             </button>
           </div>
           
+          {/* Botão para controlar a porta jusante nova */}
+          <div className="flex justify-center gap-4 mb-4">
+            <button
+              onClick={() => setPortaJusanteAberta(!portaJusanteAberta)}
+              className="px-5 py-2.5 rounded-lg text-white font-bold transition-all duration-200 hover:scale-105"
+              style={{
+                background: portaJusanteAberta 
+                  ? 'linear-gradient(to right, #16a34a, #15803d)' 
+                  : 'linear-gradient(to right, #dc2626, #b91c1c)',
+                boxShadow: portaJusanteAberta 
+                  ? '0 4px 6px -1px rgba(22, 163, 74, 0.4)' 
+                  : '0 4px 6px -1px rgba(220, 38, 38, 0.4)',
+                border: portaJusanteAberta 
+                  ? '1px solid rgba(22, 163, 74, 0.6)' 
+                  : '1px solid rgba(220, 38, 38, 0.6)'
+              }}
+            >
+              {portaJusanteAberta ? 'Fechar Porta Jusante' : 'Abrir Porta Jusante'}
+            </button>
+          </div>
+          
           {/* Container dos SVGs da Eclusa */}
           <div className="relative w-full flex justify-center flex-1">
             <div 
@@ -102,35 +126,43 @@ const Eclusa_Regua: React.FC = () => {
           {/* Exemplo de múltiplos Semáfaros com posicionamento individual */}
           <div 
             className="absolute"
-            style={{ top: '20%', left: '15%' }} // Semafaro 1
+            style={{ top: '20%', left: '15%', zIndex: 3 }}
           >
             <Semafaro />
           </div>
           <div 
             className="absolute"
-            style={{ top: '20%', left: '35%' }} // Semafaro 2
+            style={{ top: '20%', left: '35%', zIndex: 3 }}
           >
             <Semafaro />
           </div>
           <div 
             className="absolute"
-            style={{ top: '20%', left: '55%' }} // Semafaro 3
+            style={{ top: '20%', left: '55%', zIndex: 3 }}
           >
             <Semafaro />
           </div>
 
-          {/* Chamando o componente da Porta Jusante */}
+          {/* Porta Jusante - Agora com z-index mais alto para ficar por cima */}
           <div 
             className="absolute"
-            style={{ top: '10%', left: '80%' }} // Ajuste conforme necessário
+            style={{ 
+              top: '55%', 
+              left: '65%', 
+              zIndex: 10  // Z-index aumentado para ficar por cima de tudo
+            }}
           >
             <PortaJusante />
           </div>
 
-          {/* Chamando o componente da Porta Montante */}
+          {/* Porta Montante - Agora com z-index mais alto para ficar por cima */}
           <div 
             className="absolute"
-            style={{ top: '10%', left: '70%' }} // Ajuste conforme necessário
+            style={{ 
+              top: '34.5%', 
+              left: '31%', 
+              zIndex: 10  // Z-index aumentado para ficar por cima de tudo
+            }}
           >
             <PortaMontante />
           </div>

@@ -16,7 +16,9 @@ import TagMapping from './pages/tables/TagMapping';
 import Monitoramento from './pages/monitoramento/monitoramento';
 // Importação corrigida do HMIPage - use exatamente o mesmo caminho que já funcionava antes
 import HMIPage from './pages/Hmi/HMIPage'; // Note o 'Hmi' com H maiúsculo para corresponder à estrutura de pastas real
-import Eclusa_Regua from './pages/Eclusa/Eclusa_Regua'; // Importação da nova página
+import Eclusa_Regua from './pages/Eclusa/Eclusa_Regua'; // Importação da página Eclusa_Regua
+import PortaJusante from './pages/Eclusa/PortaJusante'; // Importação da página Porta Jusante
+import PortaMontantePage from './pages/Eclusa/PortaMontante'; // Importação da nova página Porta Montante
 
 const App: React.FC = () => {
   return (
@@ -89,6 +91,24 @@ const App: React.FC = () => {
               element={
                 <PrivateRoute>
                   <Eclusa_Regua />
+                </PrivateRoute>
+              }
+            />
+            {/* Rota para Porta Jusante */}
+            <Route
+              path="/porta-jusante"
+              element={
+                <PrivateRoute>
+                  <PortaJusante />
+                </PrivateRoute>
+              }
+            />
+            {/* Nova rota para Porta Montante */}
+            <Route
+              path="/porta-montante"
+              element={
+                <PrivateRoute>
+                  <PortaMontantePage />
                 </PrivateRoute>
               }
             />
