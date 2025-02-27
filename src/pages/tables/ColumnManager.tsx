@@ -36,7 +36,7 @@ const DATA_TYPES = [
   { value: 'integer', label: 'Inteiro', description: 'Números inteiros (-2147483648 a +2147483647)', color: 'blue' },
   { value: 'bigint', label: 'BigInt', description: 'Números inteiros grandes', color: 'blue' },
   { value: 'smallint', label: 'SmallInt', description: 'Números inteiros pequenos (-32768 a +32767)', color: 'blue' },
-  { value: 'float', label: 'Decimal', description: 'Números com ponto flutuante de precisão simples', color: 'purple' },
+  { value: 'float', label: 'Float', description: 'Números com ponto flutuante de precisão simples', color: 'purple' },
   { value: 'real', label: 'Real', description: 'Números com ponto flutuante de precisão simples', color: 'purple' },
   { value: 'double precision', label: 'Double', description: 'Números com ponto flutuante de precisão dupla', color: 'purple' },
   { value: 'numeric', label: 'Numérico', description: 'Números decimais com precisão exata', color: 'purple' },

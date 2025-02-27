@@ -14,6 +14,9 @@ import TableForm from './pages/tables/TableForm';
 import ColumnManager from './pages/tables/ColumnManager';
 import TagMapping from './pages/tables/TagMapping';
 import Monitoramento from './pages/monitoramento/monitoramento';
+// Importação corrigida do HMIPage - use exatamente o mesmo caminho que já funcionava antes
+import HMIPage from './pages/Hmi/HMIPage'; // Note o 'Hmi' com H maiúsculo para corresponder à estrutura de pastas real
+import Eclusa_Regua from './pages/Eclusa/Eclusa_Regua'; // Importação da nova página
 
 const App: React.FC = () => {
   return (
@@ -68,6 +71,24 @@ const App: React.FC = () => {
               element={
                 <PrivateRoute>
                   <Monitoramento />
+                </PrivateRoute>
+              }
+            />
+            {/* Nova rota para HMI */}
+            <Route
+              path="/hmi"
+              element={
+                <PrivateRoute>
+                  <HMIPage />
+                </PrivateRoute>
+              }
+            />
+            {/* Nova rota para Eclusa Régua */}
+            <Route
+              path="/eclusa-regua"
+              element={
+                <PrivateRoute>
+                  <Eclusa_Regua />
                 </PrivateRoute>
               }
             />

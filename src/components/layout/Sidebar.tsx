@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Database, Activity, Users, Ship, LogOut, Menu, Table2, Cpu } from 'lucide-react';
+import { LayoutDashboard, Database, Activity, Users, Ship, LogOut, Menu, Table2, Cpu, Monitor, Droplet } from 'lucide-react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -14,7 +14,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, onLogout }) =>
   const menuItems = [
     { icon: <LayoutDashboard className="w-5 h-5" />, text: 'Dashboard', path: '/' },
     { icon: <Database className="w-5 h-5" />, text: 'PLCs', path: '/plcs' },
-    { icon: <Activity className="w-5 h-5" />, text: 'Monitoramento', path: '/monitoramento' }, // Atualizado aqui
+    { icon: <Activity className="w-5 h-5" />, text: 'Monitoramento', path: '/monitoramento' },
+    { icon: <Monitor className="w-5 h-5" />, text: 'Transporte', path: '/hmi' },
+    { icon: <Droplet className="w-5 h-5" />, text: 'Eclusa Régua', path: '/eclusa-regua' }, // Nova opção de menu para Eclusa
     { icon: <Table2 className="w-5 h-5" />, text: 'Tabelas', path: '/tables' },
     { icon: <Users className="w-5 h-5" />, text: 'Usuários', path: '/admin/users' },
     { icon: <Ship className="w-5 h-5" />, text: 'Painel Eclusa', path: '/painel-eclusa' },
@@ -40,7 +42,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, onLogout }) =>
                 </div>
               </div>
               <span className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
-                PLC Collector
+                PLC Coletor
               </span>
             </div>
           )}
