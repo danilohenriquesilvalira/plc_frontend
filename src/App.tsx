@@ -18,7 +18,8 @@ import Monitoramento from './pages/monitoramento/monitoramento';
 import HMIPage from './pages/Hmi/HMIPage'; // Note o 'Hmi' com H maiúsculo para corresponder à estrutura de pastas real
 import Eclusa_Regua from './pages/Eclusa/Eclusa_Regua'; // Importação da página Eclusa_Regua
 import PortaJusante from './pages/Eclusa/PortaJusante'; // Importação da página Porta Jusante
-import PortaMontantePage from './pages/Eclusa/PortaMontante'; // Importação da nova página Porta Montante
+import PortaMontantePage from './pages/Eclusa/PortaMontante'; // Importação da página Porta Montante
+import Enchimento from './pages/Eclusa/Enchimento'; // Importação da nova página Enchimento
 
 const App: React.FC = () => {
   return (
@@ -103,12 +104,21 @@ const App: React.FC = () => {
                 </PrivateRoute>
               }
             />
-            {/* Nova rota para Porta Montante */}
+            {/* Rota para Porta Montante */}
             <Route
               path="/porta-montante"
               element={
                 <PrivateRoute>
                   <PortaMontantePage />
+                </PrivateRoute>
+              }
+            />
+            {/* Nova rota para Sistema de Enchimento */}
+            <Route
+              path="/enchimento"
+              element={
+                <PrivateRoute>
+                  <Enchimento />
                 </PrivateRoute>
               }
             />

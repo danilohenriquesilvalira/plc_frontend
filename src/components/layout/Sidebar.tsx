@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Database, Activity, Users, Ship, LogOut, Menu, Table2, Cpu, Monitor, Droplet, Anchor, ArrowUp } from 'lucide-react';
+import { LayoutDashboard, Database, Activity, Users, Ship, LogOut, Menu, Table2, Cpu, Monitor, Droplet, Anchor, ArrowUp, Thermometer } from 'lucide-react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -18,7 +18,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, toggleSidebar, onLogout }) =>
     { icon: <Monitor className="w-5 h-5" />, text: 'Transporte', path: '/hmi' },
     { icon: <Droplet className="w-5 h-5" />, text: 'Eclusa Régua', path: '/eclusa-regua' },
     { icon: <Anchor className="w-5 h-5" />, text: 'Porta Jusante', path: '/porta-jusante' },
-    { icon: <ArrowUp className="w-5 h-5" />, text: 'Porta Montante', path: '/porta-montante' }, // Nova opção de menu para Porta Montante
+    { icon: <ArrowUp className="w-5 h-5" />, text: 'Porta Montante', path: '/porta-montante' },
+    { icon: <Thermometer className="w-5 h-5" />, text: 'Enchimento', path: '/enchimento' }, // Nova opção de menu para Enchimento
     { icon: <Table2 className="w-5 h-5" />, text: 'Tabelas', path: '/tables' },
     { icon: <Users className="w-5 h-5" />, text: 'Usuários', path: '/admin/users' },
     { icon: <Ship className="w-5 h-5" />, text: 'Painel Eclusa', path: '/painel-eclusa' },
