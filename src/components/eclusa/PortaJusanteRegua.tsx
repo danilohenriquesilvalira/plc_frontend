@@ -1,49 +1,61 @@
-import React, { useState } from 'react';
-import PortaJusanteReguaSVG from '../../assets/eclusa/Porta_Jusante_Regua.svg';
+import React, { useState, useEffect } from 'react';
+import PortaJusanteReguaSVG from '../../assets/Eclusa/Porta_Jusante_Regua.svg';
 
 interface PortaJusanteReguaProps {
   className?: string;
+  nivel?: number;
 }
 
-const PortaJusanteRegua: React.FC<PortaJusanteReguaProps> = ({ className = '' }) => {
-  const [abertura, setAbertura] = useState(0); // Estado inicial: 0% (fechada)
+const PortaJusanteRegua: React.FC<PortaJusanteReguaProps> = ({ 
+  className = '',
+  nivel
+}) => {
+  const [aberturaInterna, setAberturaInterna] = useState(0);
+  const abertura = nivel !== undefined ? nivel : aberturaInterna;
   
   const handleAberturaChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAbertura(Number(event.target.value));
+    setAberturaInterna(Number(event.target.value));
   };
   
-  // A porta deve começar na posição mais baixa (0%) e subir até a posição mais alta (100%)
-  // Inverti a lógica: quando abertura=0, deslocamento=0; quando abertura=100, deslocamento é máximo
-  const maxDeslocamento = 300; // Valor máximo de deslocamento em pixels
+  useEffect(() => {
+    if (nivel !== undefined) {
+      setAberturaInterna(nivel);
+    }
+  }, [nivel]);
+
+  const maxDeslocamento = 300;
   const deslocamentoVertical = (abertura / 100) * maxDeslocamento;
-  
+
   return (
-    <div className={`flex flex-col items-center ${className}`}>
-      {/* Container para conter o SVG e garantir visibilidade completa */}
-      <div style={{ position: 'relative', width: '435px', height: '438px' }}>
-        {/* SVG da porta jusante régua com movimento vertical */}
-        <img 
-          src={PortaJusanteReguaSVG} 
-          alt="Porta Jusante Régua" 
-          style={{ 
-            width: '100%', 
-            height: '100%',
-            position: 'absolute',
-            bottom: `${deslocamentoVertical}px`, // A porta sobe a partir da posição original
-            transition: 'bottom 0.5s ease-in-out' // Animação suave
-          }} 
-        />
-      </div>
+    <div className={`relative ${className}`} style={{ width: '435px', height: '438px' }}>
+      {/* SVG da porta jusante régua */}
+      <img
+        src={PortaJusanteReguaSVG}
+        alt="Porta Jusante Régua"
+        style={{
+          width: '100%',
+          height: '100%',
+          position: 'absolute',
+          bottom: `${deslocamentoVertical}px`,
+          transition: 'bottom 0.3s ease-in-out'
+        }}
+      />
       
-      {/* Controles de abertura */}
-      <div className="flex items-center gap-4 mt-4">
+      {/* Controle de abertura posicionado acima da porta e centralizado */}
+      <div 
+        className="absolute left-1/2 transform -translate-x-1/2"
+        style={{ 
+          top: '-60px', // Posicionado acima da porta, fora da área de movimento
+          zIndex: 10 // Garantir que fique acima de tudo
+        }}
+      >
         <div className="bg-slate-800 px-4 py-2 rounded-lg flex items-center gap-3">
           <span className="text-white font-bold min-w-16">Abertura</span>
           <input
             type="range"
             min="0"
             max="100"
-            value={abertura}
+            value={aberturaInterna}
             onChange={handleAberturaChange}
             className="cursor-pointer h-2 w-32 rounded-lg appearance-none bg-gray-700"
           />

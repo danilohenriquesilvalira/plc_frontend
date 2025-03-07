@@ -3,13 +3,15 @@ import Header from '../../components/layout/Header';
 import Sidebar from '../../components/layout/Sidebar';
 import { useAuth } from '../../contexts/AuthContext';
 
-// Importando os componentes SVG
-import Caldeira from '../../components/eclusa/Caldeira';
-import Caldeira1 from '../../components/eclusa/Caldeira1';
+// Importando os componentes animados
 import Nivel from '../../components/eclusa/Nivel';
 import Semafaro from '../../components/eclusa/Semafaro';
 import PortaJusante from '../../components/eclusa/PortaJusante';
 import PortaMontante from '../../components/eclusa/PortaMontante';
+
+// Importando os SVGs estáticos diretamente
+import CaldeiraSVG from '../../assets/Eclusa/Caldeira.svg';
+import Caldeira1SVG from '../../assets/Eclusa/Caldeira1.svg';
 
 const Eclusa_Regua: React.FC = () => {
   const { logout } = useAuth();
@@ -22,7 +24,7 @@ const Eclusa_Regua: React.FC = () => {
   const [portaJusanteAberta, setPortaJusanteAberta] = useState(false);
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-slate-950">
+    <div className="min-h-screen flex flex-col md:flex-row" style={{ backgroundColor: '#3B3838' }}>
       <Sidebar
         isOpen={isSidebarOpen}
         toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -98,21 +100,37 @@ const Eclusa_Regua: React.FC = () => {
                 alignItems: 'center' 
               }}
             >
-              {/* Componente Caldeira1 - Parte superior */}
+              {/* Caldeira1 - Parte superior - AGORA COMO IMAGEM DIRETA */}
               <div style={{ position: 'relative', zIndex: 1 }}>
-                <Caldeira1 />
+                <img
+                  src={Caldeira1SVG}
+                  alt="Caldeira Superior"
+                  style={{
+                    width: '1672px',
+                    height: '429px',
+                  }}
+                  loading="eager" // Prioriza carregamento
+                />
               </div>
               
-              {/* Componente Caldeira - Parte inferior */}
+              {/* Caldeira - Parte inferior - AGORA COMO IMAGEM DIRETA */}
               <div style={{ position: 'relative', marginTop: '-299px', zIndex: 1 }}>
-                <Caldeira />
+                <img
+                  src={CaldeiraSVG}
+                  alt="Caldeira Inferior"
+                  style={{
+                    width: '1676px',
+                    height: '420px',
+                  }}
+                  loading="eager" // Prioriza carregamento
+                />
               </div>
               
               {/* Componente Nivel */}
               <div 
                 style={{ 
                   position: 'absolute', 
-                  top: '43%', 
+                  top: '39.2%', 
                   left: '50%', 
                   transform: 'translate(-50%, -35%)', 
                   zIndex: 2 
@@ -143,25 +161,25 @@ const Eclusa_Regua: React.FC = () => {
             <Semafaro />
           </div>
 
-          {/* Porta Jusante - Agora com z-index mais alto para ficar por cima */}
+          {/* Porta Jusante */}
           <div 
             className="absolute"
             style={{ 
               top: '55%', 
               left: '65%', 
-              zIndex: 10  // Z-index aumentado para ficar por cima de tudo
+              zIndex: 10
             }}
           >
             <PortaJusante />
           </div>
 
-          {/* Porta Montante - Agora com z-index mais alto para ficar por cima */}
+          {/* Porta Montante */}
           <div 
             className="absolute"
             style={{ 
               top: '34.5%', 
               left: '31%', 
-              zIndex: 10  // Z-index aumentado para ficar por cima de tudo
+              zIndex: 10
             }}
           >
             <PortaMontante />

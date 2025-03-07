@@ -1,33 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface ContraPesoProps {
   posicaoInicial?: number;
   posicaoMaxima?: number;
   posicaoY?: number;
+  nivel?: number;
+  className?: string;
 }
 
 const ContraPeso_Montante: React.FC<ContraPesoProps> = ({ 
   posicaoInicial = 0,
   posicaoMaxima = 300,
-  posicaoY = 0
+  posicaoY = 0,
+  nivel,
+  className = ''
 }) => {
-  const [abertura, setAbertura] = useState(posicaoInicial); // Estado inicial
+  // Usar o valor do nivel se fornecido, caso contrário usar o estado interno
+  const [aberturaInterna, setAberturaInterna] = useState(posicaoInicial);
+  
+  // Valor efetivo de abertura
+  const abertura = nivel !== undefined ? nivel : aberturaInterna;
   
   const handleAberturaChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAbertura(Number(event.target.value));
+    setAberturaInterna(Number(event.target.value));
   };
   
   // Altura da linha que se estende acima do contrapeso
-  const linhaHeight = abertura * 3.5;
+  const linhaHeight = abertura * 4; // Multiplicador aumentado para evitar cortes
+  
+  // Altura do SVG dinâmica
+  const svgHeight = Math.max(500, linhaHeight + 150);
   
   return (
-    <div className="flex items-center gap-4">
+    <div className={`flex items-center gap-4 ${className}`}>
       {/* Container do SVG completo */}
-      <div className="relative" style={{ width: '100px', height: '500px' }}>
+      <div className="relative" style={{ width: '100px', height: `${svgHeight}px` }}>
         <svg 
           width="100%" 
           height="100%" 
-          viewBox="0 0 91 500" 
+          viewBox={`0 0 91 ${svgHeight}`} 
           preserveAspectRatio="xMidYMax meet"
           fill="none" 
           xmlns="http://www.w3.org/2000/svg"
@@ -37,13 +48,16 @@ const ContraPeso_Montante: React.FC<ContraPesoProps> = ({
             x="42.5" 
             y={`${0}`} 
             width="5" 
-            height={`${linhaHeight}`} 
+            height={`${linhaHeight + 15}`} 
             fill="black"
-            style={{ transition: 'height 0.5s linear' }}
+            style={{ transition: 'height 0.1s linear' }} // Transição mais rápida: 0.1s
           />
           
           {/* Contrapeso SVG - posicionado no final da linha */}
-          <g transform={`translate(0, ${linhaHeight + posicaoY})`} style={{ transition: 'transform 0.5s linear' }}>
+          <g 
+            transform={`translate(0, ${linhaHeight + posicaoY})`} 
+            style={{ transition: 'transform 0.1s linear' }} // Transição mais rápida: 0.1s
+          >
             {/* Novo SVG do contrapeso */}
             <path d="M13.4174 133.751C4.81565 132.319 -0.01051 130.376 1.93841e-05 128.35L90.7087 128.349C90.687 130.376 86.9834 132.311 78.3589 133.745C69.7343 135.178 58.0484 135.985 45.8703 135.986C33.6923 135.987 22.0191 135.183 13.4174 133.751Z" fill="url(#paint0_linear_1745_177)"/>
             <path d="M13.4174 132.74C4.81565 131.308 -0.01051 129.365 1.93841e-05 127.338L90.7087 127.338C90.687 129.364 86.9834 131.299 78.3589 132.733C69.7343 134.167 58.0484 134.973 45.8703 134.974C33.6923 134.975 22.0191 134.171 13.4174 132.74Z" fill="url(#paint1_linear_1745_177)"/>
@@ -80,19 +94,21 @@ const ContraPeso_Montante: React.FC<ContraPesoProps> = ({
         </svg>
       </div>
       
-      {/* Controle deslizante ao lado */}
-      <div className="flex flex-col items-center">
-        <span className="text-white font-bold mb-1">Abertura</span>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={abertura}
-          onChange={handleAberturaChange}
-          className="cursor-pointer"
-        />
-        <span className="text-white mt-2 font-bold">{abertura}%</span>
-      </div>
+      {/* Controle deslizante ao lado - só exibido quando usado isoladamente */}
+      {nivel === undefined && (
+        <div className="flex flex-col items-center">
+          <span className="text-white font-bold mb-1">Abertura</span>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value={aberturaInterna}
+            onChange={handleAberturaChange}
+            className="cursor-pointer"
+          />
+          <span className="text-white mt-2 font-bold">{aberturaInterna}%</span>
+        </div>
+      )}
     </div>
   );
 };

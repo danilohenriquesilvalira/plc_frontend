@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import PortaJusanteSVG from '../../assets/eclusa/Porta_jusante.svg'; // Caminho correto do SVG
+import PortaJusanteSVG from '../../assets/Eclusa/Porta_jusante.svg'; // Caminho correto do SVG
 
 const PortaJusante: React.FC = () => {
   const [abertura, setAbertura] = useState(100); // Estado inicial: 100% ABERTA

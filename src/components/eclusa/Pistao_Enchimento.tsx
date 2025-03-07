@@ -1,5 +1,5 @@
 import React from 'react';
-import PistaoSVG from '../../assets/Eclusa/Pistao_Enchimento.svg';
+import PistaoSVG from '../../assets/Eclusa/Pistao_enchimento.svg';
 
 interface Pistao_EnchimentoProps {
   nivel: number;

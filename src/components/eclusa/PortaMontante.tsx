@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import PortaMontanteSVG from '../../assets/eclusa/Porta_Montante.svg'; // Caminho correto do SVG
+import PortaMontanteSVG from '../../assets/Eclusa/Porta_Montante.svg'; // Caminho correto do SVG
 
 const PortaMontante: React.FC = () => {
   const [abertura, setAbertura] = useState(0); // Estado inicial: 0% (fechada)
