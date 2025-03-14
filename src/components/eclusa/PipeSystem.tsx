@@ -18,7 +18,7 @@ const PipeSystem: React.FC<PipeSystemProps> = ({
   // Cores baseadas no estado - cores exatas conforme solicitado
   const getColor = (pipeId: string) => {
     const state = pipeStates[pipeId] || 0;
-    return state === 1 ? 'rgb(219, 88, 0)' : 'rgb(117, 62, 0)'; // Laranja se ativo, marrom se inativo
+    return state === 1 ? '#FC6500' : '#753E00'; // Laranja se ativo, marrom se inativo
   };
 
   // Manipulador de clique para os pipes
@@ -37,7 +37,7 @@ const PipeSystem: React.FC<PipeSystemProps> = ({
     >
       {/* Pipe 1 */}
       <path 
-        d="M417 286V422.5" 
+        d="M417 285.5L417 422.5" 
         stroke={getColor('pipe1')} 
         strokeWidth="10"
         onClick={() => handlePipeClick('pipe1')}
@@ -46,7 +46,7 @@ const PipeSystem: React.FC<PipeSystemProps> = ({
       
       {/* Pipe 2 */}
       <path 
-        d="M395.5 200H440.5C441.605 200 442.5 200.895 442.5 202V279C442.5 280.105 441.605 281 440.5 281H392.5" 
+        d="M392.5 200H440.512C441.612 200 442.506 200.888 442.512 201.988L442.988 278.488C442.994 279.597 442.097 280.5 440.988 280.5H398.5" 
         stroke={getColor('pipe2')} 
         strokeWidth="10"
         onClick={() => handlePipeClick('pipe2')}
@@ -55,7 +55,7 @@ const PipeSystem: React.FC<PipeSystemProps> = ({
       
       {/* Pipe 3 */}
       <path 
-        d="M202 319.5H286C287.105 319.5 288 318.605 288 317.5V17C288 15.8954 288.895 15 290 15H443M443 15V178.5C443 179.605 442.105 180.5 441 180.5H396M443 15H487.5C488.605 15 489.5 15.8954 489.5 17V32.5" 
+        d="M202.5 319H217M443 15H290C288.895 15 288 15.8954 288 17V317C288 318.105 287.105 319 286 319H249M443 15V178C443 179.105 442.105 180 441 180H394M443 15H487.5C488.605 15 489.5 15.8954 489.5 17V32.5M489.5 50V56V61.5" 
         stroke={getColor('pipe3')} 
         strokeWidth="10"
         onClick={() => handlePipeClick('pipe3')}
@@ -73,16 +73,25 @@ const PipeSystem: React.FC<PipeSystemProps> = ({
       
       {/* Pipe 5 */}
       <path 
-        d="M96.5 31.5H53.5C52.3954 31.5 51.5 32.3954 51.5 33.5V287.5V316.5C51.5 317.605 52.3954 318.5 53.5 318.5H96.5" 
+        d="M96.5 31.5H49.5C48.3954 31.5 47.5 32.3954 47.5 33.5L47.5 286.5M66.5 318.5H96.5" 
         stroke={getColor('pipe5')} 
         strokeWidth="10"
         onClick={() => handlePipeClick('pipe5')}
         style={{ cursor: onPipeClick ? 'pointer' : 'default' }}
       />
       
-      {/* Pipe 6 */}
+      {/* Pipe 6 - Parte 1 */}
       <path 
-        d="M32 319.5H25C23.8954 319.5 23 320.395 23 321.5V346C23 347.105 23.8954 348 25 348H318.5C319.605 348 320.5 347.105 320.5 346V182C320.5 180.895 321.395 180 322.5 180H358" 
+        d="M23 319.5V348M320.5 348V182C320.5 180.895 321.395 180 322.5 180H358" 
+        stroke={getColor('pipe6')} 
+        strokeWidth="10"
+        onClick={() => handlePipeClick('pipe6')}
+        style={{ cursor: onPipeClick ? 'pointer' : 'default' }}
+      />
+      
+      {/* Pipe 6 - Parte 2 */}
+      <path 
+        d="M32.5 318.5H25C23.8954 318.5 23 319.395 23 320.5V347.5C23 348.605 23.8954 349.5 25 349.5H260M358 180H322.5C321.395 180 320.5 180.895 320.5 182V347.5C320.5 348.605 319.605 349.5 318.5 349.5H291.5" 
         stroke={getColor('pipe6')} 
         strokeWidth="10"
         onClick={() => handlePipeClick('pipe6')}
@@ -91,7 +100,7 @@ const PipeSystem: React.FC<PipeSystemProps> = ({
       
       {/* Pipe 7 */}
       <path 
-        d="M489 50V126" 
+        d="M489 85.5L489 142" 
         stroke={getColor('pipe7')} 
         strokeWidth="10"
         onClick={() => handlePipeClick('pipe7')}
@@ -109,7 +118,7 @@ const PipeSystem: React.FC<PipeSystemProps> = ({
       
       {/* Pipe 9 */}
       <path 
-        d="M489 236.5V399" 
+        d="M489 230.5V399" 
         stroke={getColor('pipe9')} 
         strokeWidth="10"
         onClick={() => handlePipeClick('pipe9')}
@@ -118,7 +127,7 @@ const PipeSystem: React.FC<PipeSystemProps> = ({
       
       {/* Pipe 10 */}
       <path 
-        d="M488 15H538C539.105 15 540 15.8954 540 17V32.5" 
+        d="M488 15H538C539.105 15 540 15.8954 540 17V32.5M540 50V61.5" 
         stroke={getColor('pipe10')} 
         strokeWidth="10"
         onClick={() => handlePipeClick('pipe10')}
@@ -127,7 +136,7 @@ const PipeSystem: React.FC<PipeSystemProps> = ({
       
       {/* Pipe 11 */}
       <path 
-        d="M538 15H588C589.105 15 590 15.8954 590 17V33V176C590 177.105 589.105 178 588 178H511.5C510.395 178 509.5 178.895 509.5 180V199" 
+        d="M538 15H588C589.105 15 590 15.8954 590 17V32M509.5 199V180C509.5 178.895 510.395 178 511.5 178H588C589.105 178 590 177.105 590 176V86M590 61.5V49.5" 
         stroke={getColor('pipe11')} 
         strokeWidth="10"
         onClick={() => handlePipeClick('pipe11')}
@@ -136,7 +145,7 @@ const PipeSystem: React.FC<PipeSystemProps> = ({
       
       {/* Pipe 12 */}
       <path 
-        d="M539 50V110C539 111.105 538.105 112 537 112H511C509.895 112 509 112.895 509 114V126" 
+        d="M539 86V110C539 111.105 538.105 112 537 112H511C509.895 112 509 112.895 509 114L509 133" 
         stroke={getColor('pipe12')} 
         strokeWidth="10"
         onClick={() => handlePipeClick('pipe12')}
@@ -154,7 +163,7 @@ const PipeSystem: React.FC<PipeSystemProps> = ({
       
       {/* Pipe 14 */}
       <path 
-        d="M883 200.536H838C836.895 200.536 836 201.432 836 202.536V279.536C836 280.641 836.895 281.536 838 281.536H886" 
+        d="M883 201.5L838 201.5C836.895 201.5 836 202.395 836 203.5V279.536C836 280.641 836.895 281.536 838 281.536H886" 
         stroke={getColor('pipe14')} 
         strokeWidth="10"
         onClick={() => handlePipeClick('pipe14')}
@@ -163,7 +172,7 @@ const PipeSystem: React.FC<PipeSystemProps> = ({
       
       {/* Pipe 15 */}
       <path 
-        d="M1076.5 320.036H992.5C991.395 320.036 990.5 319.14 990.5 318.036V17.5361C990.5 16.4316 989.605 15.5361 988.5 15.5361H835.5M835.5 15.5361V179.036C835.5 180.141 836.395 181.036 837.5 181.036H882.5M835.5 15.5361H791C789.895 15.5361 789 16.4316 789 17.5361V33.0361" 
+        d="M835.5 15.5361H988.5C989.605 15.5361 990.5 16.4316 990.5 17.5361V318.036C990.5 319.14 991.395 320.036 992.5 320.036H1030.5M835.5 15.5361V179.036C835.5 180.141 836.395 181.036 837.5 181.036H882.5M835.5 15.5361H791C789.895 15.5361 789 16.4316 789 17.5361V33.0361M1057.5 320.036H1075.5M789 61.5V49.5" 
         stroke={getColor('pipe15')} 
         strokeWidth="10"
         onClick={() => handlePipeClick('pipe15')}
@@ -181,7 +190,7 @@ const PipeSystem: React.FC<PipeSystemProps> = ({
       
       {/* Pipe 17 */}
       <path 
-        d="M1182 32.0361H1225C1226.1 32.0361 1227 32.9316 1227 34.0361V288.036V317.036C1227 318.14 1226.1 319.036 1225 319.036H1182" 
+        d="M1181.5 31H1225C1226.1 31 1227 31.8954 1227 33V288.036M1209.5 319.036H1182" 
         stroke={getColor('pipe17')} 
         strokeWidth="10"
         onClick={() => handlePipeClick('pipe17')}
@@ -190,7 +199,7 @@ const PipeSystem: React.FC<PipeSystemProps> = ({
       
       {/* Pipe 18 */}
       <path 
-        d="M1246.5 320.036H1253.5C1254.6 320.036 1255.5 320.931 1255.5 322.036V346.536C1255.5 347.641 1254.6 348.536 1253.5 348.536H960C958.895 348.536 958 347.641 958 346.536V182.536C958 181.432 957.105 180.536 956 180.536H920.5" 
+        d="M1246.5 320.036H1253.5C1254.6 320.036 1255.5 320.931 1255.5 322.036V347.5C1255.5 348.605 1254.6 349.5 1253.5 349.5H1019M918.5 181H956C957.105 181 958 181.895 958 183V347.5C958 348.605 958.895 349.5 960 349.5H987" 
         stroke={getColor('pipe18')} 
         strokeWidth="10"
         onClick={() => handlePipeClick('pipe18')}
@@ -199,7 +208,7 @@ const PipeSystem: React.FC<PipeSystemProps> = ({
       
       {/* Pipe 19 */}
       <path 
-        d="M789.5 50.5361V126.536" 
+        d="M789.5 86V126.536" 
         stroke={getColor('pipe19')} 
         strokeWidth="10"
         onClick={() => handlePipeClick('pipe19')}
@@ -208,7 +217,7 @@ const PipeSystem: React.FC<PipeSystemProps> = ({
       
       {/* Pipe 20 */}
       <path 
-        d="M789 163.608V199.533" 
+        d="M789 163V199.533" 
         stroke={getColor('pipe20')} 
         strokeWidth="10"
         onClick={() => handlePipeClick('pipe20')}
@@ -217,7 +226,7 @@ const PipeSystem: React.FC<PipeSystemProps> = ({
       
       {/* Pipe 21 */}
       <path 
-        d="M789.5 237.036V399.536" 
+        d="M789.5 236V399.536" 
         stroke={getColor('pipe21')} 
         strokeWidth="10"
         onClick={() => handlePipeClick('pipe21')}
@@ -226,7 +235,7 @@ const PipeSystem: React.FC<PipeSystemProps> = ({
       
       {/* Pipe 22 */}
       <path 
-        d="M790.5 15.5361H740.5C739.395 15.5361 738.5 16.4316 738.5 17.5361V33.0361" 
+        d="M790.5 15.5361H740.5C739.395 15.5361 738.5 16.4316 738.5 17.5361V32M738.5 62V50" 
         stroke={getColor('pipe22')} 
         strokeWidth="10"
         onClick={() => handlePipeClick('pipe22')}
@@ -235,7 +244,7 @@ const PipeSystem: React.FC<PipeSystemProps> = ({
       
       {/* Pipe 23 */}
       <path 
-        d="M740.5 15.5361H690.5C689.395 15.5361 688.5 16.4316 688.5 17.5361V33.5361V176.536C688.5 177.641 689.395 178.536 690.5 178.536H767C768.105 178.536 769 179.431 769 180.536V199.536" 
+        d="M740.5 15.5361H690.5C689.395 15.5361 688.5 16.4316 688.5 17.5361V32M769 199.536V180.536C769 179.431 768.105 178.536 767 178.536H690.5C689.395 178.536 688.5 177.641 688.5 176.536V86M688.5 61.5V49.5" 
         stroke={getColor('pipe23')} 
         strokeWidth="10"
         onClick={() => handlePipeClick('pipe23')}
@@ -244,7 +253,7 @@ const PipeSystem: React.FC<PipeSystemProps> = ({
       
       {/* Pipe 24 */}
       <path 
-        d="M739.5 50.5361V110.536C739.5 111.641 740.395 112.536 741.5 112.536H767.5C768.605 112.536 769.5 113.431 769.5 114.536V126.536" 
+        d="M739.5 85.5V106.5C739.5 107.605 740.395 108.5 741.5 108.5H767.5C768.605 108.5 769.5 109.395 769.5 110.5V126.536" 
         stroke={getColor('pipe24')} 
         strokeWidth="10"
         onClick={() => handlePipeClick('pipe24')}

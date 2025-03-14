@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 interface MotorProps {
@@ -11,8 +10,8 @@ interface MotorProps {
 
 const Motor: React.FC<MotorProps> = ({ 
   status = 0, 
-  width = 296, 
-  height = 207, 
+  width = 82, 
+  height = 40, 
   className = '' 
 }) => {
   // Define colors based on status
@@ -34,46 +33,51 @@ const Motor: React.FC<MotorProps> = ({
     <svg 
       width={width} 
       height={height} 
-      viewBox="0 0 296 207" 
+      viewBox="0 0 82 40" 
       fill="none" 
       xmlns="http://www.w3.org/2000/svg"
       className={className}
     >
-      <path d="M295.6 46.7998H278.5V137.6H295.6V46.7998Z" fill="url(#paint0_linear_1761_183)" stroke="#646567" strokeWidth="0.75" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M19.9999 9.45996H23.5334V26.3437H19.9999V9.45996Z" fill="url(#paint0_linear_1825_122)" stroke="#646567" strokeWidth="0.75" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
       
       {/* Corpo principal do motor - Muda de cor com o status */}
-      <path d="M250.2 1.2998H45.7998V183.1H250.2V1.2998Z" fill={mainColor} stroke="#8C8C91" strokeWidth="0.75" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M29.3816 1H71.6187V34.8046H29.3816V1Z" fill={mainColor} stroke="#8C8C91" strokeWidth="0.75" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
       
-      <path d="M248.7 20.0996H46.8999V50.9996H248.7V20.0996Z" fill="url(#paint2_linear_1761_183)"/>
-      <path d="M46.9997 1.7998H46.1997V182.7H46.9997V1.7998Z" fill="url(#paint3_linear_1761_183)"/>
+      <path d="M29.6913 4.49609H71.3911V10.2418H29.6913V4.49609Z" fill="url(#paint2_linear_1825_122)"/>
+      <path d="M71.3706 1.09375H71.5359V34.731H71.3706V1.09375Z" fill="url(#paint3_linear_1825_122)"/>
       
       {/* Parte lateral do motor - Também muda de cor */}
-      <path d="M250.2 165.4L278.5 148.2V36.3L250.2 19V165.4Z" fill={secondaryColor} stroke="#8C8C91" strokeWidth="0.75" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M29.3816 31.5142L23.5337 28.3159V7.50882L29.3816 4.29199V31.5142Z" fill={secondaryColor} stroke="#8C8C91" strokeWidth="0.75" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
       
-      <path d="M277.9 66.7L250.8 59V34L277.9 47.6V66.7Z" fill="url(#paint5_linear_1761_183)"/>
+      <path d="M23.6574 13.1614L29.2573 11.7297V7.08105L23.6574 9.60989V13.1614Z" fill="url(#paint5_linear_1825_122)"/>
       
       {/* Outra parte lateral do motor - Também muda de cor */}
-      <path d="M0.399902 171.9L45.7999 183.1V1.2998L0.399902 12.4998V171.9Z" fill={secondaryColor} stroke="#8C8C91" strokeWidth="0.75" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M81 32.722L71.6186 34.8046V1L81 3.08257V32.722Z" fill={secondaryColor} stroke="#8C8C91" strokeWidth="0.75" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
       
-      <path d="M44.6001 50.9996L1.1001 56.1996V29.0996L44.6001 20.0996V50.9996Z" fill="url(#paint7_linear_1761_183)"/>
-      <path d="M244.3 11.9998L245.7 13.1998V20.3998H238.6V23.7998H68.3998V18.0998H244.4V11.9998H244.3ZM244.3 41.2998H68.2998V49.7998H238.5V43.5998H245.6V36.3998L244.2 35.1998V41.2998H244.3ZM244.3 1.2998V7.1998H68.2998V12.2998H238.5V9.7998H245.6V2.5998L244.3 1.2998ZM244.3 23.4998V29.7998H68.2998V35.4998H238.5V31.9998H245.6V24.7998L244.3 23.4998ZM244.3 49.4998V55.6998H68.2998V66.9998H238.5V57.9998H245.6V50.7998L244.3 49.4998ZM244.3 66.5998V72.7998H68.2998V84.0998H238.5V75.0998H245.6V67.8998L244.3 66.5998ZM244.3 83.7998V89.9998H68.2998V101.3H238.5V92.2998H245.6V84.9998L244.3 83.7998Z" fill="url(#paint8_linear_1761_183)"/>
-      <path d="M68.3999 7.1998H244.4V1.2998H68.3999V7.1998ZM68.3999 18.1998H244.4V12.2998H68.3999V18.1998ZM68.3999 29.7998H244.4V23.8998H68.3999V29.7998ZM68.3999 41.2998H244.4V35.3998H68.3999V41.2998ZM68.3999 55.6998H244.4V49.7998H68.3999V55.6998ZM68.3999 72.7998H244.4V66.9998H68.3999V72.7998ZM68.3999 89.9998H244.4V84.0998H68.3999V89.9998Z" fill="url(#paint9_linear_1761_183)" stroke="#8C8C91" strokeWidth="0.75" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M71.8667 10.2418L80.8555 11.2087V6.16959L71.8667 4.49609V10.2418Z" fill="url(#paint7_linear_1825_122)"/>
+      <path d="M30.6008 2.9896L30.3115 3.21273V4.55153H31.7786V5.18374H66.9486V4.12386H30.5801V2.9896H30.6008ZM30.6008 8.43776H66.9692V10.0183H31.7993V8.86543H30.3321V7.52663L30.6214 7.3035V8.43776H30.6008ZM30.6008 1V2.09707H66.9692V3.04538H31.7993V2.58052H30.3321V1.24173L30.6008 1ZM30.6008 5.12795V6.2994H66.9692V7.35928H31.7993V6.70848H30.3321V5.36968L30.6008 5.12795ZM30.6008 9.9625V11.1153H66.9692V13.2165H31.7993V11.543H30.3321V10.2042L30.6008 9.9625ZM30.6008 13.1421V14.295H66.9692V16.3962H31.7993V14.7227H30.3321V13.3839L30.6008 13.1421ZM30.6008 16.3404V17.4932H66.9692V19.5944H31.7993V17.9209H30.3321V16.5635L30.6008 16.3404Z" fill="url(#paint8_linear_1825_122)"/>
+      <path d="M66.9487 2.09707H30.5802V1H66.9487V2.09707ZM66.9487 4.14245H30.5802V3.04538H66.9487V4.14245ZM66.9487 6.2994H30.5802V5.20233H66.9487V6.2994ZM66.9487 8.43776H30.5802V7.34069H66.9487V8.43776ZM66.9487 11.1153H30.5802V10.0183H66.9487V11.1153ZM66.9487 14.295H30.5802V13.2165H66.9487V14.295ZM66.9487 17.4932H30.5802V16.3962H66.9487V17.4932Z" fill="url(#paint9_linear_1825_122)" stroke="#8C8C91" strokeWidth="0.75" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
       
       {/* Base do motor - Permanece com cor original */}
-      <path d="M227.3 183.1H64.5V205.6H227.3V183.1Z" fill="url(#paint10_linear_1761_183)" stroke="#8C8C91" strokeWidth="0.75" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M227.3 183.1H64.5V190.2H227.3V183.1Z" fill="#646567" stroke="#646567" strokeWidth="0.75" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M159.3 205.6V114.7C159.3 114.7 160.5 120.2 166.6 130.8C166.6 130.8 167.5 170.6 174.5 183.1V205.6H159.3Z" fill="#646567" stroke="#646567" strokeWidth="0.75" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M34.1135 34.8057H67.7544V38.9894H34.1135V34.8057Z" fill="url(#paint10_linear_1825_122)" stroke="#8C8C91" strokeWidth="0.75" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M34.1135 34.8057H67.7544V36.1259H34.1135V34.8057Z" fill="#646567" stroke="#646567" strokeWidth="0.75" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M48.1648 38.9882V22.0859C48.1648 22.0859 47.9168 23.1086 46.6563 25.0796C46.6563 25.0796 46.4704 32.4802 45.0239 34.8045V38.9882H48.1648Z" fill="#646567" stroke="#646567" strokeWidth="0.75" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
       
       {/* Painel frontal do motor - Também muda de cor */}
-      <path d="M159.3 114.8H79.7002V205.7H159.3V114.8Z" fill={mainColor} stroke="#646567" strokeWidth="0.75" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M48.165 22.1055H64.6135V39.0078H48.165V22.1055Z" fill={mainColor} stroke="#646567" strokeWidth="0.75" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
       
-      <path d="M87.7003 120.1C87.7003 121.6 86.5003 122.8 85.0003 122.8C83.5003 122.8 82.3003 121.6 82.3003 120.1C82.3003 118.6 83.5003 117.4 85.0003 117.4C86.5003 117.4 87.7003 118.6 87.7003 120.1ZM153.9 117.4C152.4 117.4 151.2 118.6 151.2 120.1C151.2 121.6 152.4 122.8 153.9 122.8C155.4 122.8 156.6 121.6 156.6 120.1C156.6 118.6 155.4 117.4 153.9 117.4ZM85.0003 197.5C83.5003 197.5 82.3003 198.7 82.3003 200.2C82.3003 201.7 83.5003 202.9 85.0003 202.9C86.5003 202.9 87.7003 201.7 87.7003 200.2C87.7003 198.7 86.5003 197.5 85.0003 197.5ZM153.9 197.5C152.4 197.5 151.2 198.7 151.2 200.2C151.2 201.7 152.4 202.9 153.9 202.9C155.4 202.9 156.6 201.7 156.6 200.2C156.6 198.7 155.4 197.5 153.9 197.5Z" fill="url(#paint12_linear_1761_183)" stroke="#575756" strokeWidth="0.75" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M89.5 196.5V123.8H149.4" stroke="white" strokeWidth="0.75" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M149.4 123.8V196.5H89.5" stroke="#646567" strokeWidth="0.75" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M62.9603 23.0909C62.9603 23.3698 63.2083 23.593 63.5182 23.593C63.8282 23.593 64.0762 23.3698 64.0762 23.0909C64.0762 22.812 63.8282 22.5889 63.5182 22.5889C63.2083 22.5889 62.9603 22.812 62.9603 23.0909ZM49.2808 22.5889C49.5908 22.5889 49.8387 22.812 49.8387 23.0909C49.8387 23.3698 49.5908 23.593 49.2808 23.593C48.9709 23.593 48.7229 23.3698 48.7229 23.0909C48.7229 22.812 48.9709 22.5889 49.2808 22.5889ZM63.5182 37.483C63.8282 37.483 64.0762 37.7061 64.0762 37.985C64.0762 38.2639 63.8282 38.4871 63.5182 38.4871C63.2083 38.4871 62.9603 38.2639 62.9603 37.985C62.9603 37.7061 63.2083 37.483 63.5182 37.483ZM49.2808 37.483C49.5908 37.483 49.8387 37.7061 49.8387 37.985C49.8387 38.2639 49.5908 38.4871 49.2808 38.4871C48.9709 38.4871 48.7229 38.2639 48.7229 37.985C48.7229 37.7061 48.9709 37.483 49.2808 37.483Z" fill="url(#paint12_linear_1825_122)" stroke="#575756" strokeWidth="0.75" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M62.5886 37.2964V23.7783H50.2109" stroke="white" strokeWidth="0.75" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M50.2109 23.7783V37.2964H62.5886" stroke="#646567" strokeWidth="0.75" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+      
+      {/* Nova seção do motor (parte vermelha) - Mantém sua cor original */}
+      <path d="M6.86667 28V27.5C6.86667 26.9477 6.41895 26.5 5.86667 26.5H2C1.44772 26.5 1 26.0523 1 25.5V9C1 8.44772 1.44772 8 2 8H5.86667C6.41895 8 6.86667 7.55228 6.86667 7V6C6.86667 5.44772 6.41895 5 5.86667 5H5.42222C4.86994 5 4.42222 4.55228 4.42222 4V2C4.42222 1.44772 4.86994 1 5.42222 1H19.0667C19.619 1 20.0667 1.44772 20.0667 2V4C20.0667 4.55228 19.6189 5 19.0667 5H18.6222C18.0699 5 17.6222 5.44772 17.6222 6V7C17.6222 7.55228 18.0699 8 18.6222 8H22C22.5523 8 23 8.44772 23 9V25.5C23 26.0523 22.5523 26.5 22 26.5H18.6222C18.0699 26.5 17.6222 26.9477 17.6222 27.5V28C17.6222 28.5523 18.0699 29 18.6222 29H19.0667C19.619 29 20.0667 29.4477 20.0667 30V32C20.0667 32.5523 19.6189 33 19.0667 33H5.42222C4.86994 33 4.42222 32.5523 4.42222 32V30C4.42222 29.4477 4.86994 29 5.42222 29H5.86667C6.41895 29 6.86667 28.5523 6.86667 28Z" fill="#5C0303" stroke="black"/>
+      <circle cx="12.5" cy="16.5" r="5" stroke="#4F4848"/>
+      <circle cx="12.5" cy="16.5" r="8" stroke="#4F4848"/>
       
       {/* Definições dos gradientes originais mantidos para elementos que não mudam de cor */}
       <defs>
-        <linearGradient id="paint0_linear_1761_183" x1="287.057" y1="43.9261" x2="287.057" y2="109.954" gradientUnits="userSpaceOnUse">
+        <linearGradient id="paint0_linear_1825_122" x1="21.7653" y1="8.92561" x2="21.7653" y2="21.2031" gradientUnits="userSpaceOnUse">
           <stop stopColor="#575756"/>
           <stop offset="0.0158648" stopColor="#5D5C5C"/>
           <stop offset="0.1171" stopColor="#797878"/>
@@ -85,11 +89,11 @@ const Motor: React.FC<MotorProps> = ({
           <stop offset="0.9127" stopColor="#676666"/>
           <stop offset="1" stopColor="#575756"/>
         </linearGradient>
-        <linearGradient id="paint2_linear_1761_183" x1="147.794" y1="22.8531" x2="147.794" y2="35.6035" gradientUnits="userSpaceOnUse">
+        <linearGradient id="paint2_linear_1825_122" x1="50.5425" y1="5.00809" x2="50.5425" y2="7.37895" gradientUnits="userSpaceOnUse">
           <stop stopColor="#F2F2F2" stopOpacity="0.4"/>
           <stop offset="1" stopColor="#F7F7F7" stopOpacity="0.7"/>
         </linearGradient>
-        <linearGradient id="paint3_linear_1761_183" x1="46.5998" y1="104.012" x2="46.5998" y2="178.051" gradientUnits="userSpaceOnUse">
+        <linearGradient id="paint3_linear_1825_122" x1="71.4532" y1="20.0994" x2="71.4532" y2="33.8665" gradientUnits="userSpaceOnUse">
           <stop stopColor="#ECECEC"/>
           <stop offset="0.1504" stopColor="#E8E8E8"/>
           <stop offset="0.3032" stopColor="#DCDCDC"/>
@@ -99,19 +103,19 @@ const Motor: React.FC<MotorProps> = ({
           <stop offset="0.9214" stopColor="#5A5A5A"/>
           <stop offset="1" stopColor="#404040"/>
         </linearGradient>
-        <linearGradient id="paint5_linear_1761_183" x1="266.657" y1="35.7192" x2="263.753" y2="54.3039" gradientUnits="userSpaceOnUse">
+        <linearGradient id="paint5_linear_1825_122" x1="25.9806" y1="7.40073" x2="26.4687" y2="10.8722" gradientUnits="userSpaceOnUse">
           <stop stopColor="#F2F2F2" stopOpacity="0.4"/>
           <stop offset="1" stopColor="#F7F7F7" stopOpacity="0.7"/>
         </linearGradient>
-        <linearGradient id="paint7_linear_1761_183" x1="20.5987" y1="23.6187" x2="22.6961" y2="37.0756" gradientUnits="userSpaceOnUse">
+        <linearGradient id="paint7_linear_1825_122" x1="76.8263" y1="5.15045" x2="76.4738" y2="7.66402" gradientUnits="userSpaceOnUse">
           <stop stopColor="#F2F2F2" stopOpacity="0.4"/>
           <stop offset="1" stopColor="#F7F7F7" stopOpacity="0.7"/>
         </linearGradient>
-        <linearGradient id="paint8_linear_1761_183" x1="157.068" y1="19.2498" x2="157.068" y2="241.257" gradientUnits="userSpaceOnUse">
+        <linearGradient id="paint8_linear_1825_122" x1="48.6263" y1="4.33769" x2="48.6263" y2="45.6186" gradientUnits="userSpaceOnUse">
           <stop stopColor="#666666"/>
           <stop offset="1" stopColor="#1A1A1A"/>
         </linearGradient>
-        <linearGradient id="paint9_linear_1761_183" x1="156.369" y1="2.4602" x2="156.368" y2="183.399" gradientUnits="userSpaceOnUse">
+        <linearGradient id="paint9_linear_1825_122" x1="48.771" y1="1.21577" x2="48.771" y2="34.8602" gradientUnits="userSpaceOnUse">
           <stop/>
           <stop offset="0.0475815"/>
           <stop offset="0.1509"/>
@@ -125,11 +129,11 @@ const Motor: React.FC<MotorProps> = ({
           <stop offset="0.9452"/>
           <stop offset="1"/>
         </linearGradient>
-        <linearGradient id="paint10_linear_1761_183" x1="-70.043" y1="111.311" x2="308.624" y2="256.977" gradientUnits="userSpaceOnUse">
+        <linearGradient id="paint10_linear_1825_122" x1="95.5562" y1="21.4568" x2="19.6094" y2="53.924" gradientUnits="userSpaceOnUse">
           <stop stopColor="white"/>
           <stop offset="1" stopColor="#7C7C7B"/>
         </linearGradient>
-        <linearGradient id="paint12_linear_1761_183" x1="115.882" y1="155.796" x2="182.971" y2="237.759" gradientUnits="userSpaceOnUse">
+        <linearGradient id="paint12_linear_1825_122" x1="57.137" y1="29.7283" x2="44.9837" y2="46.2284" gradientUnits="userSpaceOnUse">
           <stop stopColor="#666666"/>
           <stop offset="1" stopColor="#1A1A1A"/>
         </linearGradient>
