@@ -2,18 +2,33 @@ import React, { useState, useEffect, useRef } from 'react';
 import Header from '../../components/layout/Header';
 import Sidebar from '../../components/layout/Sidebar';
 import { useAuth } from '../../contexts/AuthContext';
+import { useWebSocket } from '../../contexts/WebSocketContext';
 // Importando o SVG da estrutura da porta jusante
 import EstruturaPortaJusanteSVG from '../../assets/Eclusa/Estrutura_Porta_Jusante.svg';
 // Importando o componente da porta jusante régua
 import PortaJusanteRegua from '../../components/eclusa/PortaJusanteRegua';
 // Importando o componente do contrapeso
 import ContraPeso from '../../components/eclusa/ContraPeso';
+// Importando o componente do motor
+import MotorMontante from '../../components/eclusa/Motor_Montante';
 
 const PortaJusante: React.FC = () => {
   const { logout } = useAuth();
+  const { message } = useWebSocket();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [scale, setScale] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Estado para os motores (0 = inativo, 1 = operando, 2 = falha)
+  const [motoresStatus, setMotoresStatus] = useState<{ motor1: 0 | 1 | 2; motor2: 0 | 1 | 2 }>({
+    motor1: 1,
+    motor2: 1
+  });
+  
+  // Estados para WebSocket
+  const [contraPesoEsquerda, setContraPesoEsquerda] = useState<number>(50);
+  const [contraPesoDireita, setContraPesoDireita] = useState<number>(50);
+  const [portaJusanteAbertura, setPortaJusanteAbertura] = useState<number>(0);
 
   // Esta função será chamada quando a tela for redimensionada
   const handleResize = () => {
@@ -47,6 +62,53 @@ const PortaJusante: React.FC = () => {
     };
   }, []);
 
+  // WebSocket
+  useEffect(() => {
+    if (message && message.tags) {
+      // Motores
+      const motorEsquerdaTag = message.tags.find((tag: any) => tag.name === "Motor_Esquerda_Jusante");
+      const motorDireitaTag = message.tags.find((tag: any) => tag.name === "Motor_Direita_Jusante");
+      
+      if (motorEsquerdaTag !== undefined) {
+        console.log('Motor Esquerda Jusante:', motorEsquerdaTag.value);
+        setMotoresStatus(prev => ({ 
+          ...prev, 
+          motor1: Number(motorEsquerdaTag.value) as 0 | 1 | 2 
+        }));
+      }
+      
+      if (motorDireitaTag !== undefined) {
+        console.log('Motor Direita Jusante:', motorDireitaTag.value);
+        setMotoresStatus(prev => ({ 
+          ...prev, 
+          motor2: Number(motorDireitaTag.value) as 0 | 1 | 2 
+        }));
+      }
+      
+      // Contrapesos
+      const contraPesoEsquerdaTag = message.tags.find((tag: any) => tag.name === "Contra_Peso_Esquerda_Jusante");
+      const contraPesoDireitaTag = message.tags.find((tag: any) => tag.name === "Contra_Peso_Direita_Jusante");
+      
+      if (contraPesoEsquerdaTag !== undefined) {
+        console.log('Contrapeso Esquerda Jusante:', contraPesoEsquerdaTag.value);
+        setContraPesoEsquerda(Number(contraPesoEsquerdaTag.value));
+      }
+      
+      if (contraPesoDireitaTag !== undefined) {
+        console.log('Contrapeso Direita Jusante:', contraPesoDireitaTag.value);
+        setContraPesoDireita(Number(contraPesoDireitaTag.value));
+      }
+      
+      // Porta
+      const portaJusanteTag = message.tags.find((tag: any) => tag.name === "Porta_Jusante");
+      
+      if (portaJusanteTag !== undefined) {
+        console.log('Porta Jusante:', portaJusanteTag.value);
+        setPortaJusanteAbertura(Number(portaJusanteTag.value));
+      }
+    }
+  }, [message]);
+
   return (
     <div className="min-h-screen flex flex-col md:flex-row" style={{ backgroundColor: '#3B3838' }}>
       <Sidebar
@@ -63,14 +125,12 @@ const PortaJusante: React.FC = () => {
           ref={containerRef}
           className="flex-1 flex flex-col justify-center items-center relative overflow-hidden px-2 pt-0"
         >
-          {/* Removido o título duplicado "Monitoramento da Porta Jusante" */}
-          
           {/* Container principal para a visualização com escala responsiva */}
           <div
             className="relative mt-0"
             style={{ 
               transform: `scale(${scale})`,
-              transformOrigin: 'center top', // Alterado para 'top' para que o conteúdo suba
+              transformOrigin: 'center top',
               width: '789px',
               height: '830px',
               maxWidth: '100%'
@@ -99,7 +159,7 @@ const PortaJusante: React.FC = () => {
                 zIndex: 2
               }}
             >
-              <PortaJusanteRegua />
+              <PortaJusanteRegua abertura={portaJusanteAbertura} />
             </div>
             
             {/* Contrapeso Esquerdo */}
@@ -107,12 +167,12 @@ const PortaJusante: React.FC = () => {
               style={{
                 position: 'absolute',
                 top: '431px',
-                left: '28px',
+                left: '-3px',
                 zIndex: 2,
                 transform: 'scale(1.3)'
               }}
             >
-              <ContraPeso />
+              <ContraPeso nivel={contraPesoEsquerda} />
             </div>
             
             {/* Contrapeso Direito */}
@@ -120,12 +180,28 @@ const PortaJusante: React.FC = () => {
               style={{
                 position: 'absolute',
                 top: '431px',
-                right: '-246px',
+                right: '-8px',
                 zIndex: 3,
                 transform: 'scale(1.3)'
               }}
             >
-              <ContraPeso />
+              <ContraPeso nivel={contraPesoDireita} />
+            </div>
+            
+            {/* Motor Montante Esquerdo */}
+            <div 
+              className="absolute" 
+              style={{ left: '5px', top: '25px', transform: 'scale(1.5) scaleX(-1)', zIndex: 3 }}
+            >
+              <MotorMontante status={motoresStatus.motor1} />
+            </div>
+            
+            {/* Motor Montante Direito */}
+            <div 
+              className="absolute" 
+              style={{ right: '5px', top: '25px', transform: 'scale(1.5)', zIndex: 3 }}
+            >
+              <MotorMontante status={motoresStatus.motor2} />
             </div>
           </div>
         </main>

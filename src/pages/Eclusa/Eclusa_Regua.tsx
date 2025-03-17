@@ -7,7 +7,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import Nivel from '../../components/eclusa/Nivel';
 import Semafaro from '../../components/eclusa/Semafaro';
 import PortaJusante from '../../components/eclusa/PortaJusante';
-import PortaMontante from '../../components/eclusa/PortaMontante';
+// Removida a importação de PortaMontanteRegua
 
 // Importando os SVGs estáticos diretamente
 import CaldeiraSVG from '../../assets/Eclusa/Caldeira.svg';
@@ -22,6 +22,8 @@ const Eclusa_Regua: React.FC = () => {
   
   // Estado para controlar a abertura da porta jusante nova
   const [portaJusanteAberta, setPortaJusanteAberta] = useState(false);
+  
+  // Removido o estado de abertura da porta montante
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row" style={{ backgroundColor: '#3B3838' }}>
@@ -86,6 +88,8 @@ const Eclusa_Regua: React.FC = () => {
               {portaJusanteAberta ? 'Fechar Porta Jusante' : 'Abrir Porta Jusante'}
             </button>
           </div>
+          
+          {/* Removido o botão de controle da porta montante */}
           
           {/* Container dos SVGs da Eclusa */}
           <div className="relative w-full flex justify-center flex-1">
@@ -173,17 +177,7 @@ const Eclusa_Regua: React.FC = () => {
             <PortaJusante />
           </div>
 
-          {/* Porta Montante */}
-          <div 
-            className="absolute"
-            style={{ 
-              top: '34.5%', 
-              left: '31%', 
-              zIndex: 10
-            }}
-          >
-            <PortaMontante />
-          </div>
+          {/* Removido o componente da Porta Montante */}
           
         </main>
       </div>

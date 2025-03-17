@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../../components/layout/Header';
 import Sidebar from '../../components/layout/Sidebar';
 import { useAuth } from '../../contexts/AuthContext';
+import { useWebSocket } from '../../contexts/WebSocketContext';
 import PipeSystem from '../../components/eclusa/PipeSystem';
 import CilindroEnchimento from '../../components/eclusa/CilindroEnchimento';
 import ValvulaEsquerda from '../../components/eclusa/ValvulaEsquerda';
@@ -13,10 +14,19 @@ import ValvulaVertical from '../../components/eclusa/ValvulaVertical';
 import Motor from '../../components/eclusa/Motor';
 import TanqueOleo from '../../components/eclusa/TanqueOleo';
 import Pistao_Enchimento from '../../components/eclusa/Pistao_Enchimento';
+import BasePistaoEnchimentoSVG from '../../assets/Eclusa/BasePistaoEnchimento.svg';
+
+interface Tag {
+  id: number;
+  name: string;
+  value: any;
+}
 
 const Enchimento: React.FC = () => {
   const { logout } = useAuth();
+  const { message } = useWebSocket();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [tags, setTags] = useState<Tag[]>([]);
 
   // Estado para os tubos (0 = inativo, 1 = ativo)
   const [pipeStates, setPipeStates] = useState<{ [key: string]: 0 | 1 }>({
@@ -93,56 +103,148 @@ const Enchimento: React.FC = () => {
   const [pistao1Pos, setPistao1Pos] = useState<number>(1000);
   const [pistao2Pos, setPistao2Pos] = useState<number>(1000);
 
-  // Funções para alternar os estados
-  const toggleValvulaEsquerda = (id: string) => {
-    setValvulasEsquerda(prev => ({
-      ...prev,
-      [id]: prev[id] === 1 ? 0 : 1
-    }));
-  };
+  // Recebe mensagens do WebSocket e atualiza tags
+  useEffect(() => {
+    if (message && message.tags) {
+      setTags(message.tags);
+      console.log("Recebendo tags do WebSocket:", message.tags);
+    }
+  }, [message]);
 
-  const toggleValvulaDireita = (id: string) => {
-    setValvulasDireita(prev => ({
-      ...prev,
-      [id]: prev[id] === 1 ? 0 : 1
-    }));
-  };
+  // Processa os tags recebidos e atualiza os estados
+  useEffect(() => {
+    if (tags.length > 0) {
+      // Atualiza pipes
+      const newPipeStates = { ...pipeStates };
+      for (let i = 1; i <= 24; i++) {
+        const pipeTag = tags.find(tag => tag.name === `pipe_${i}`);
+        if (pipeTag !== undefined) {
+          newPipeStates[`pipe${i}`] = Number(pipeTag.value) as 0 | 1;
+        }
+      }
+      setPipeStates(newPipeStates);
 
-  const toggleValvulaStatus = (id: string) => {
-    setValvulasStatus(prev => {
-      const currentStatus = prev[id];
-      const newStatus = currentStatus === 0 ? 1 : currentStatus === 1 ? 2 : 0;
-      return { ...prev, [id]: newStatus as 0 | 1 | 2 };
-    });
-  };
+      // Atualiza cilindros
+      const cilindroEsquerdoTag = tags.find(tag => tag.name === "Cilindro_Esquerdo");
+      if (cilindroEsquerdoTag !== undefined) {
+        setCilindroEsquerdoEstado(Number(cilindroEsquerdoTag.value) as 0 | 1);
+      }
+      const cilindroDireitoTag = tags.find(tag => tag.name === "Cilindro_Direito");
+      if (cilindroDireitoTag !== undefined) {
+        setCilindroDireitoEstado(Number(cilindroDireitoTag.value) as 0 | 1);
+      }
 
-  const toggleValvulaEsfera = (id: string) => {
-    setValvulasEsfera(prev => ({
-      ...prev,
-      [id]: prev[id] === 1 ? 0 : 1
-    }));
-  };
+      // Atualiza válvulas esquerdas
+      const valvulaEsquerda1Tag = tags.find(tag => tag.name === "Valvula_Esquerda_E1");
+      const valvulaEsquerda2Tag = tags.find(tag => tag.name === "Valvula_Esquerda_E2");
+      const valvulaEsquerda3Tag = tags.find(tag => tag.name === "Valvula_Esquerda_E3");
+      const newValvulasEsquerda = { ...valvulasEsquerda };
+      if (valvulaEsquerda1Tag !== undefined) {
+        newValvulasEsquerda.valvulaEsquerda1 = Number(valvulaEsquerda1Tag.value) as 0 | 1;
+      }
+      if (valvulaEsquerda2Tag !== undefined) {
+        newValvulasEsquerda.valvulaEsquerda2 = Number(valvulaEsquerda2Tag.value) as 0 | 1;
+      }
+      if (valvulaEsquerda3Tag !== undefined) {
+        newValvulasEsquerda.valvulaEsquerda3 = Number(valvulaEsquerda3Tag.value) as 0 | 1;
+      }
+      setValvulasEsquerda(newValvulasEsquerda);
 
-  const toggleValvulaGaveta = (id: string) => {
-    setValvulasGaveta(prev => ({
-      ...prev,
-      [id]: !prev[id]
-    }));
-  };
+      // Atualiza válvulas direitas
+      const valvulaDireita1Tag = tags.find(tag => tag.name === "Valvula_Direita_E1");
+      const valvulaDireita2Tag = tags.find(tag => tag.name === "Valvula_Direita_E2");
+      const valvulaDireita3Tag = tags.find(tag => tag.name === "Valvula_Direita_E3");
+      const newValvulasDireita = { ...valvulasDireita };
+      if (valvulaDireita1Tag !== undefined) {
+        newValvulasDireita.valvulaDireita1 = Number(valvulaDireita1Tag.value) as 0 | 1;
+      }
+      if (valvulaDireita2Tag !== undefined) {
+        newValvulasDireita.valvulaDireita2 = Number(valvulaDireita2Tag.value) as 0 | 1;
+      }
+      if (valvulaDireita3Tag !== undefined) {
+        newValvulasDireita.valvulaDireita3 = Number(valvulaDireita3Tag.value) as 0 | 1;
+      }
+      setValvulasDireita(newValvulasDireita);
 
-  const toggleValvulaVertical = (id: string) => {
-    setValvulasVerticais(prev => ({
-      ...prev,
-      [id]: prev[id] === 1 ? 0 : 1
-    }));
-  };
+      // Atualiza válvulas gaveta
+      const newValvulasGaveta = { ...valvulasGaveta };
+      for (let i = 1; i <= 6; i++) {
+        const gavetaTag = tags.find(tag => tag.name === `Valvula_Gaveta_G${i}`);
+        if (gavetaTag !== undefined) {
+          newValvulasGaveta[`gaveta${i}`] = Boolean(Number(gavetaTag.value));
+        }
+      }
+      setValvulasGaveta(newValvulasGaveta);
 
-  const setMotorStatus = (id: string, status: 0 | 1 | 2) => {
-    setMotoresStatus(prev => ({
-      ...prev,
-      [id]: status
-    }));
-  };
+      // Atualiza válvulas triangulares (usando tags: Valvula_1 até Valvula_6)
+      const newValvulasTriangulares = { ...valvulasStatus };
+      for (let i = 1; i <= 6; i++) {
+        const valvulaTag = tags.find(tag => tag.name === `Valvula_${i}`);
+        if (valvulaTag !== undefined) {
+          newValvulasTriangulares[`valvula${i}`] = Number(valvulaTag.value) as 0 | 1 | 2;
+        }
+      }
+      setValvulasStatus(newValvulasTriangulares);
+
+      // Atualiza válvulas esfera (usando tags: Valvula_Esfera_1 até Valvula_Esfera_6)
+      const newValvulasEsfera = { ...valvulasEsfera };
+      for (let i = 1; i <= 6; i++) {
+        const esferaTag = tags.find(tag => tag.name === `Valvula_Esfera_${i}`);
+        if (esferaTag !== undefined) {
+          newValvulasEsfera[`esfera${i}`] = Number(esferaTag.value) as 0 | 1;
+        }
+      }
+      setValvulasEsfera(newValvulasEsfera);
+
+      // Atualiza válvulas verticais
+      const vertical1Tag = tags.find(tag => tag.name === "Valvula_Verticais_VT1");
+      const vertical2Tag = tags.find(tag => tag.name === "Valvula_Verticais_VT2");
+      const newValvulasVerticais = { ...valvulasVerticais };
+      if (vertical1Tag !== undefined) {
+        newValvulasVerticais.vertical1 = Number(vertical1Tag.value) as 0 | 1;
+      }
+      if (vertical2Tag !== undefined) {
+        newValvulasVerticais.vertical2 = Number(vertical2Tag.value) as 0 | 1;
+      }
+      setValvulasVerticais(newValvulasVerticais);
+
+      // Atualiza motores
+      const motorEsquerdoTag = tags.find(tag => tag.name === "Motor_Esquerdo");
+      const motorDireitoTag = tags.find(tag => tag.name === "Motor_Direito");
+      const newMotoresStatus = { ...motoresStatus };
+      if (motorEsquerdoTag !== undefined) {
+        newMotoresStatus.motor1 = Number(motorEsquerdoTag.value) as 0 | 1 | 2;
+      }
+      if (motorDireitoTag !== undefined) {
+        newMotoresStatus.motor2 = Number(motorDireitoTag.value) as 0 | 1 | 2;
+      }
+      setMotoresStatus(newMotoresStatus);
+
+      // Atualiza nível do tanque
+      const nivelTanqueTag = tags.find(tag => tag.name === "Nivel_Tanque");
+      if (nivelTanqueTag !== undefined) {
+        setNivelTanqueOleo(Number(nivelTanqueTag.value));
+      }
+
+      // Atualiza posição dos pistões (inverte a lógica: 0% -> 1124, 100% -> 886)
+      const pistao1Tag = tags.find(tag => tag.name === "Posicao_Pistao_1");
+      if (pistao1Tag !== undefined) {
+        const min = 886;
+        const max = 1124;
+        const range = max - min;
+        const position = max - (Number(pistao1Tag.value) / 100 * range);
+        setPistao1Pos(position);
+      }
+      const pistao2Tag = tags.find(tag => tag.name === "Posicao_Pistao_2");
+      if (pistao2Tag !== undefined) {
+        const min = 886;
+        const max = 1124;
+        const range = max - min;
+        const position = max - (Number(pistao2Tag.value) / 100 * range);
+        setPistao2Pos(position);
+      }
+    }
+  }, [tags]);
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row" style={{ backgroundColor: '#3B3838' }}>
@@ -162,9 +264,8 @@ const Enchimento: React.FC = () => {
             <div style={{ position: 'relative', zIndex: 0 }}>
               {/* Tanque de Óleo */}
               <div 
-                className="absolute cursor-pointer" 
+                className="absolute" 
                 style={{ left: '380px', top: '310px', transform: 'scale(1.0)', zIndex: 1 }}
-                onClick={() => setNivelTanqueOleo((prev) => (prev + 10) % 110)}
               >
                 <TanqueOleo nivel={nivelTanqueOleo} />
               </div>
@@ -184,7 +285,20 @@ const Enchimento: React.FC = () => {
             </div>
             {/* Container de Primeiro Plano: Demais componentes e Pistões */}
             <div style={{ position: 'relative', zIndex: 3 }}>
-              {/* Pistão 1 com zIndex maior para ficar por cima do CilindroEnchimento */}
+              {/* Base dos Pistões */}
+              <div 
+                className="absolute"
+                style={{ left: '58px', top: '446px', width: '200px', height: '200px', zIndex: 50 }}
+              >
+                <img src={BasePistaoEnchimentoSVG} alt="Base do Pistão Esquerdo" />
+              </div>
+              <div 
+                className="absolute"
+                style={{ right: '58px', top: '446px', width: '200px', height: '200px', zIndex: 50 }}
+              >
+                <img src={BasePistaoEnchimentoSVG} alt="Base do Pistão Direito" />
+              </div>
+              {/* Pistão 1 */}
               <div
                 className="absolute"
                 style={{
@@ -197,7 +311,7 @@ const Enchimento: React.FC = () => {
               >
                 <Pistao_Enchimento nivel={pistao1Pos} />
               </div>
-              {/* Pistão 2 com zIndex maior para ficar por cima */}
+              {/* Pistão 2 */}
               <div
                 className="absolute"
                 style={{
@@ -212,527 +326,195 @@ const Enchimento: React.FC = () => {
               </div>
               {/* Cilindro Esquerdo */}
               <div className="absolute" style={{ left: '100px', top: '16px' }}>
-                <div 
-                  className="cursor-pointer" 
-                  onClick={() => setCilindroEsquerdoEstado(prev => (prev === 0 ? 1 : 0))}
-                >
+                <div className="cursor-pointer">
                   <CilindroEnchimento estado={cilindroEsquerdoEstado} />
                 </div>
               </div>
               {/* Cilindro Direito */}
               <div className="absolute" style={{ right: '104px', top: '16px' }}>
-                <div 
-                  className="cursor-pointer" 
-                  onClick={() => setCilindroDireitoEstado(prev => (prev === 0 ? 1 : 0))}
-                >
+                <div className="cursor-pointer">
                   <CilindroEnchimento estado={cilindroDireitoEstado} />
                 </div>
               </div>
               {/* Motor Esquerdo */}
               <div 
-                className="absolute cursor-pointer" 
+                className="absolute" 
                 style={{ left: '480px', top: '270px', transform: 'scale(1)' }}
-                onClick={() => setMotorStatus('motor1', (motoresStatus.motor1 + 1) % 3 as 0 | 1 | 2)}
               >
                 <Motor status={motoresStatus.motor1} />
               </div>
               {/* Motor Direito */}
               <div 
-                className="absolute cursor-pointer" 
+                className="absolute" 
                 style={{ right: '480px', top: '270px', transform: 'scale(1.0) scaleX(-1)' }}
-                onClick={() => setMotorStatus('motor2', (motoresStatus.motor2 + 1) % 3 as 0 | 1 | 2)}
               >
                 <Motor status={motoresStatus.motor2} />
               </div>
               {/* Válvulas – Lado Esquerdo (usando ValvulaDireita) */}
               <div 
-                className="absolute cursor-pointer" 
+                className="absolute" 
                 style={{ left: '463px', top: '130px' }}
-                onClick={() => toggleValvulaEsquerda('valvulaEsquerda1')}
               >
                 <ValvulaDireita estado={valvulasEsquerda.valvulaEsquerda1} />
               </div>
               <div 
-                className="absolute cursor-pointer" 
+                className="absolute" 
                 style={{ left: '463px', top: '196px' }}
-                onClick={() => toggleValvulaEsquerda('valvulaEsquerda2')}
               >
                 <ValvulaDireita estado={valvulasEsquerda.valvulaEsquerda2} />
               </div>
               <div 
-                className="absolute cursor-pointer" 
+                className="absolute" 
                 style={{ left: '352px', top: '158px', transform: 'rotate(90deg)' }}
-                onClick={() => toggleValvulaEsquerda('valvulaEsquerda3')}
               >
                 <ValvulaDireita estado={valvulasEsquerda.valvulaEsquerda3} />
               </div>
               {/* Válvulas – Lado Direito (usando ValvulaEsquerda) */}
               <div 
-                className="absolute cursor-pointer" 
+                className="absolute" 
                 style={{ right: '463px', top: '122px' }}
-                onClick={() => toggleValvulaDireita('valvulaDireita1')}
               >
                 <ValvulaEsquerda estado={valvulasDireita.valvulaDireita1} />
               </div>
               <div 
-                className="absolute cursor-pointer" 
+                className="absolute" 
                 style={{ right: '463px', top: '196px' }}
-                onClick={() => toggleValvulaDireita('valvulaDireita2')}
               >
                 <ValvulaEsquerda estado={valvulasDireita.valvulaDireita2} />
               </div>
               <div 
-                className="absolute cursor-pointer" 
+                className="absolute" 
                 style={{ right: '354px', top: '158px', transform: 'rotate(-90deg)' }}
-                onClick={() => toggleValvulaDireita('valvulaDireita3')}
               >
                 <ValvulaEsquerda estado={valvulasDireita.valvulaDireita3} />
               </div>
               {/* Válvulas Triangulares */}
               <div 
-                className="absolute cursor-pointer" 
+                className="absolute" 
                 style={{ left: '464px', top: '40px', transform: 'rotate(90deg) scale(0.5)' }}
-                onClick={() => toggleValvulaStatus('valvula1')}
               >
                 <Valvula status={valvulasStatus.valvula1} />
               </div>
               <div 
-                className="absolute cursor-pointer" 
+                className="absolute" 
                 style={{ left: '514px', top: '40px', transform: 'rotate(90deg) scale(0.5)' }}
-                onClick={() => toggleValvulaStatus('valvula2')}
               >
                 <Valvula status={valvulasStatus.valvula2} />
               </div>
               <div 
-                className="absolute cursor-pointer" 
+                className="absolute" 
                 style={{ left: '563px', top: '40px', transform: 'rotate(90deg) scale(0.5)' }}
-                onClick={() => toggleValvulaStatus('valvula3')}
               >
                 <Valvula status={valvulasStatus.valvula3} />
               </div>
               <div 
-                className="absolute cursor-pointer" 
+                className="absolute" 
                 style={{ right: '546px', top: '40px', transform: 'rotate(90deg) scale(0.5)' }}
-                onClick={() => toggleValvulaStatus('valvula4')}
               >
                 <Valvula status={valvulasStatus.valvula4} />
               </div>
               <div 
-                className="absolute cursor-pointer" 
+                className="absolute" 
                 style={{ right: '496px', top: '40px', transform: 'rotate(90deg) scale(0.5)' }}
-                onClick={() => toggleValvulaStatus('valvula5')}
               >
                 <Valvula status={valvulasStatus.valvula5} />
               </div>
               <div 
-                className="absolute cursor-pointer" 
+                className="absolute" 
                 style={{ right: '446px', top: '40px', transform: 'rotate(90deg) scale(0.5)' }}
-                onClick={() => toggleValvulaStatus('valvula6')}
               >
                 <Valvula status={valvulasStatus.valvula6} />
               </div>
               {/* Válvulas Esfera */}
               <div 
-                className="absolute cursor-pointer" 
+                className="absolute" 
                 style={{ left: '483px', top: '28px', transform: 'scale(1.3)' }}
-                onClick={() => toggleValvulaEsfera('esfera1')}
               >
                 <ValvulaEsfera estado={valvulasEsfera.esfera1} />
               </div>
               <div 
-                className="absolute cursor-pointer" 
+                className="absolute" 
                 style={{ left: '532px', top: '28px', transform: 'scale(1.3)' }}
-                onClick={() => toggleValvulaEsfera('esfera2')}
               >
                 <ValvulaEsfera estado={valvulasEsfera.esfera2} />
               </div>
               <div 
-                className="absolute cursor-pointer" 
+                className="absolute" 
                 style={{ left: '582px', top: '28px', transform: 'scale(1.3)' }}
-                onClick={() => toggleValvulaEsfera('esfera3')}
               >
                 <ValvulaEsfera estado={valvulasEsfera.esfera3} />
               </div>
               <div 
-                className="absolute cursor-pointer" 
+                className="absolute" 
                 style={{ right: '582px', top: '28px', transform: 'scale(1.3)' }}
-                onClick={() => toggleValvulaEsfera('esfera4')}
               >
                 <ValvulaEsfera estado={valvulasEsfera.esfera4} />
               </div>
               <div 
-                className="absolute cursor-pointer" 
+                className="absolute" 
                 style={{ right: '533px', top: '28px', transform: 'scale(1.3)' }}
-                onClick={() => toggleValvulaEsfera('esfera5')}
               >
                 <ValvulaEsfera estado={valvulasEsfera.esfera5} />
               </div>
               <div 
-                className="absolute cursor-pointer" 
+                className="absolute" 
                 style={{ right: '483px', top: '28px', transform: 'scale(1.3)' }}
-                onClick={() => toggleValvulaEsfera('esfera6')}
               >
                 <ValvulaEsfera estado={valvulasEsfera.esfera6} />
               </div>
               {/* Válvulas Gaveta */}
               <div 
-                className="absolute cursor-pointer" 
+                className="absolute" 
                 style={{ left: '50px', top: '132px', transform: 'scale(0.08)' }}
-                onClick={() => toggleValvulaGaveta('gaveta1')}
               >
                 <ValvulaGaveta estado={valvulasGaveta.gaveta1} />
               </div>
               <div 
-                className="absolute cursor-pointer" 
+                className="absolute" 
                 style={{ left: '92px', top: '163px', transform: 'scale(0.08)' }}
-                onClick={() => toggleValvulaGaveta('gaveta2')}
               >
                 <ValvulaGaveta estado={valvulasGaveta.gaveta2} />
               </div>
               <div 
-                className="absolute cursor-pointer" 
+                className="absolute" 
                 style={{ left: '200px', top: '95px', transform: 'scale(0.08)' }}
-                onClick={() => toggleValvulaGaveta('gaveta3')}
               >
                 <ValvulaGaveta estado={valvulasGaveta.gaveta3} />
               </div>
               <div 
-                className="absolute cursor-pointer" 
+                className="absolute" 
                 style={{ right: '200px', top: '95px', transform: 'scale(0.08)' }}
-                onClick={() => toggleValvulaGaveta('gaveta4')}
               >
                 <ValvulaGaveta estado={valvulasGaveta.gaveta4} />
               </div>
               <div 
-                className="absolute cursor-pointer" 
+                className="absolute" 
                 style={{ right: '92px', top: '163px', transform: 'scale(0.08)' }}
-                onClick={() => toggleValvulaGaveta('gaveta5')}
               >
                 <ValvulaGaveta estado={valvulasGaveta.gaveta5} />
               </div>
               <div 
-                className="absolute cursor-pointer" 
+                className="absolute" 
                 style={{ right: '50px', top: '134px', transform: 'scale(0.08)' }}
-                onClick={() => toggleValvulaGaveta('gaveta6')}
               >
                 <ValvulaGaveta estado={valvulasGaveta.gaveta6} />
               </div>
               {/* Válvulas Verticais */}
               <div 
-                className="absolute cursor-pointer" 
+                className="absolute" 
                 style={{ left: '39px', top: '280px', transform: 'scale(1.1)' }}
-                onClick={() => toggleValvulaVertical('vertical1')}
               >
                 <ValvulaVertical estado={valvulasVerticais.vertical1} />
               </div>
               <div 
-                className="absolute cursor-pointer" 
+                className="absolute" 
                 style={{ right: '39px', top: '280px', transform: 'scale(1.1)' }}
-                onClick={() => toggleValvulaVertical('vertical2')}
               >
                 <ValvulaVertical estado={valvulasVerticais.vertical2} />
               </div>
             </div>
           </div>
         </main>
-        {/* Área de Controles */}
-        <div className="p-4 bg-slate-800/40">
-          {/* Controles dos Cilindros */}
-          <div className="flex justify-center flex-wrap gap-4 mb-4">
-            <div>
-              <span className="text-white mr-2">Cilindro Esquerdo:</span>
-              <button 
-                onClick={() => setCilindroEsquerdoEstado(0)} 
-                className={`px-2 py-1 rounded text-xs mr-2 ${
-                  cilindroEsquerdoEstado === 0 
-                    ? 'bg-slate-600 text-white' 
-                    : 'bg-slate-700 text-gray-300'
-                }`}
-              >
-                Marrom
-              </button>
-              <button 
-                onClick={() => setCilindroEsquerdoEstado(1)} 
-                className={`px-2 py-1 rounded text-xs ${
-                  cilindroEsquerdoEstado === 1 
-                    ? 'bg-orange-600 text-white' 
-                    : 'bg-slate-700 text-gray-300'
-                }`}
-              >
-                Laranja
-              </button>
-            </div>
-            <div>
-              <span className="text-white mr-2">Cilindro Direito:</span>
-              <button 
-                onClick={() => setCilindroDireitoEstado(0)} 
-                className={`px-2 py-1 rounded text-xs mr-2 ${
-                  cilindroDireitoEstado === 0 
-                    ? 'bg-slate-600 text-white' 
-                    : 'bg-slate-700 text-gray-300'
-                }`}
-              >
-                Marrom
-              </button>
-              <button 
-                onClick={() => setCilindroDireitoEstado(1)} 
-                className={`px-2 py-1 rounded text-xs ${
-                  cilindroDireitoEstado === 1 
-                    ? 'bg-orange-600 text-white' 
-                    : 'bg-slate-700 text-gray-300'
-                }`}
-              >
-                Laranja
-              </button>
-            </div>
-          </div>
-          {/* Controles dos Motores */}
-          <div className="flex justify-center flex-wrap gap-4 mb-4">
-            <div>
-              <span className="text-white mr-2">Motor Esquerdo:</span>
-              <button 
-                onClick={() => setMotorStatus('motor1', 0)} 
-                className={`px-2 py-1 rounded text-xs mr-2 ${
-                  motoresStatus.motor1 === 0 
-                    ? 'bg-slate-600 text-white' 
-                    : 'bg-slate-700 text-gray-300'
-                }`}
-              >
-                Inativo
-              </button>
-              <button 
-                onClick={() => setMotorStatus('motor1', 1)} 
-                className={`px-2 py-1 rounded text-xs mr-2 ${
-                  motoresStatus.motor1 === 1 
-                    ? 'bg-green-600 text-white' 
-                    : 'bg-slate-700 text-gray-300'
-                }`}
-              >
-                Operando
-              </button>
-              <button 
-                onClick={() => setMotorStatus('motor1', 2)} 
-                className={`px-2 py-1 rounded text-xs ${
-                  motoresStatus.motor1 === 2 
-                    ? 'bg-red-600 text-white' 
-                    : 'bg-slate-700 text-gray-300'
-                }`}
-              >
-                Falha
-              </button>
-            </div>
-            <div>
-              <span className="text-white mr-2">Motor Direito:</span>
-              <button 
-                onClick={() => setMotorStatus('motor2', 0)} 
-                className={`px-2 py-1 rounded text-xs mr-2 ${
-                  motoresStatus.motor2 === 0 
-                    ? 'bg-slate-600 text-white' 
-                    : 'bg-slate-700 text-gray-300'
-                }`}
-              >
-                Inativo
-              </button>
-              <button 
-                onClick={() => setMotorStatus('motor2', 1)} 
-                className={`px-2 py-1 rounded text-xs mr-2 ${
-                  motoresStatus.motor2 === 1 
-                    ? 'bg-green-600 text-white' 
-                    : 'bg-slate-700 text-gray-300'
-                }`}
-              >
-                Operando
-              </button>
-              <button 
-                onClick={() => setMotorStatus('motor2', 2)} 
-                className={`px-2 py-1 rounded text-xs ${
-                  motoresStatus.motor2 === 2 
-                    ? 'bg-red-600 text-white' 
-                    : 'bg-slate-700 text-gray-300'
-                }`}
-              >
-                Falha
-              </button>
-            </div>
-          </div>
-          {/* Controle do Tanque de Óleo */}
-          <div className="flex justify-center flex-wrap gap-4 mb-4">
-            <div>
-              <span className="text-white mr-2">Nível do Tanque de Óleo:</span>
-              <button 
-                onClick={() => setNivelTanqueOleo(Math.max(0, nivelTanqueOleo - 10))} 
-                className="px-2 py-1 rounded text-xs mr-2 bg-slate-700 text-white"
-              >
-                -10%
-              </button>
-              <span className="text-white mx-2">{nivelTanqueOleo}%</span>
-              <button 
-                onClick={() => setNivelTanqueOleo(Math.min(100, nivelTanqueOleo + 10))} 
-                className="px-2 py-1 rounded text-xs ml-2 bg-slate-700 text-white"
-              >
-                +10%
-              </button>
-              <button 
-                onClick={() => setNivelTanqueOleo(0)} 
-                className="px-2 py-1 rounded text-xs ml-4 bg-gray-600 text-white"
-              >
-                Vazio
-              </button>
-              <button 
-                onClick={() => setNivelTanqueOleo(100)} 
-                className="px-2 py-1 rounded text-xs ml-2 bg-orange-600 text-white"
-              >
-                Cheio
-              </button>
-            </div>
-          </div>
-          {/* Controles dos Pistões */}
-          <div className="flex justify-center flex-wrap gap-4 mb-4">
-            <div>
-              <label className="text-white mr-2">Posição do Pistão 1:</label>
-              <input 
-                type="range" 
-                min="886" 
-                max="1200" 
-                value={pistao1Pos} 
-                onChange={(e) => setPistao1Pos(Number(e.target.value))} 
-                className="mr-2"
-              />
-              <span className="text-white">{pistao1Pos}px</span>
-            </div>
-            <div>
-              <label className="text-white mr-2">Posição do Pistão 2:</label>
-              <input 
-                type="range" 
-                min="886" 
-                max="1200" 
-                value={pistao2Pos} 
-                onChange={(e) => setPistao2Pos(Number(e.target.value))} 
-                className="mr-2"
-              />
-              <span className="text-white">{pistao2Pos}px</span>
-            </div>
-          </div>
-          {/* Controles das Válvulas */}
-          <div className="grid grid-cols-6 gap-2">
-            <div>
-              <h3 className="text-white font-medium mb-2">Válvulas Esquerdas</h3>
-              <div className="grid grid-cols-3 gap-1">
-                {Object.entries(valvulasEsquerda).map(([id, estado]) => (
-                  <div key={id} className="flex items-center">
-                    <button 
-                      onClick={() => toggleValvulaEsquerda(id)} 
-                      className={`px-2 py-1 rounded text-xs mr-1 ${
-                        estado === 1 
-                          ? 'bg-orange-600 text-white' 
-                          : 'bg-gray-600 text-gray-200'
-                      }`}
-                    >
-                      {id.replace('valvulaEsquerda', 'E')}
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div>
-              <h3 className="text-white font-medium mb-2">Válvulas Direitas</h3>
-              <div className="grid grid-cols-3 gap-1">
-                {Object.entries(valvulasDireita).map(([id, estado]) => (
-                  <div key={id} className="flex items-center">
-                    <button 
-                      onClick={() => toggleValvulaDireita(id)} 
-                      className={`px-2 py-1 rounded text-xs mr-1 ${
-                        estado === 1 
-                          ? 'bg-orange-600 text-white' 
-                          : 'bg-gray-600 text-gray-200'
-                      }`}
-                    >
-                      {id.replace('valvulaDireita', 'D')}
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div>
-              <h3 className="text-white font-medium mb-2">Válvulas Triangulares</h3>
-              <div className="grid grid-cols-3 gap-1">
-                {Object.entries(valvulasStatus).map(([id, status]) => (
-                  <div key={id} className="flex items-center">
-                    <button 
-                      onClick={() => toggleValvulaStatus(id)} 
-                      className={`px-2 py-1 rounded text-xs mr-1 ${
-                        status === 0 
-                          ? 'bg-gray-600 text-gray-200' 
-                          : status === 1 
-                            ? 'bg-green-600 text-white' 
-                            : 'bg-red-600 text-white'
-                      }`}
-                    >
-                      {id.replace('valvula', 'V')}
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div>
-              <h3 className="text-white font-medium mb-2">Válvulas Esfera</h3>
-              <div className="grid grid-cols-3 gap-1">
-                {Object.entries(valvulasEsfera).map(([id, estado]) => (
-                  <div key={id} className="flex items-center">
-                    <button 
-                      onClick={() => toggleValvulaEsfera(id)} 
-                      className={`px-2 py-1 rounded text-xs mr-1 ${
-                        estado === 1 
-                          ? 'bg-orange-600 text-white' 
-                          : 'bg-gray-600 text-gray-200'
-                      }`}
-                    >
-                      {id.replace('esfera', 'E')}
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div>
-              <h3 className="text-white font-medium mb-2">Válvulas Gaveta</h3>
-              <div className="grid grid-cols-3 gap-1">
-                {Object.entries(valvulasGaveta).map(([id, estado]) => (
-                  <div key={id} className="flex items-center">
-                    <button 
-                      onClick={() => toggleValvulaGaveta(id)} 
-                      className={`px-2 py-1 rounded text-xs mr-1 ${
-                        estado 
-                          ? 'bg-orange-600 text-white' 
-                          : 'bg-gray-600 text-gray-200'
-                      }`}
-                    >
-                      {id.replace('gaveta', 'G')}
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div>
-              <h3 className="text-white font-medium mb-2">Válvulas Verticais</h3>
-              <div className="grid grid-cols-2 gap-1">
-                {Object.entries(valvulasVerticais).map(([id, estado]) => (
-                  <div key={id} className="flex items-center">
-                    <button 
-                      onClick={() => toggleValvulaVertical(id)} 
-                      className={`px-2 py-1 rounded text-xs mr-1 ${
-                        estado === 1 
-                          ? 'bg-orange-600 text-white' 
-                          : 'bg-gray-600 text-gray-200'
-                      }`}
-                    >
-                      {id.replace('vertical', 'VT')}
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

@@ -1,20 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface ContraPesoProps {
   posicaoInicial?: number;
   posicaoMaxima?: number;
   posicaoY?: number;
+  nivel?: number; // Adicionando prop para WebSocket
 }
 
 const ContraPeso: React.FC<ContraPesoProps> = ({ 
   posicaoInicial = 0,
   posicaoMaxima = 300,
-  posicaoY = 0
+  posicaoY = 0,
+  nivel
 }) => {
-  const [abertura, setAbertura] = useState(posicaoInicial); // Estado inicial
+  const [aberturaInterna, setAberturaInterna] = useState(posicaoInicial); // Estado interno
+  
+  // Usar o valor do nivel (WebSocket) se fornecido, senão usar o interno
+  const abertura = nivel !== undefined ? nivel : aberturaInterna;
   
   const handleAberturaChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAbertura(Number(event.target.value));
+    setAberturaInterna(Number(event.target.value));
   };
   
   // Altura da linha que se estende acima do contrapeso
@@ -79,19 +84,21 @@ const ContraPeso: React.FC<ContraPesoProps> = ({
         </svg>
       </div>
       
-      {/* Controle deslizante ao lado */}
-      <div className="flex flex-col items-center">
-        <span className="text-white font-bold mb-1">Abertura</span>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={abertura}
-          onChange={handleAberturaChange}
-          className="cursor-pointer"
-        />
-        <span className="text-white mt-2 font-bold">{abertura}%</span>
-      </div>
+      {/* Controle deslizante ao lado - só mostrar se não receber nivel */}
+      {nivel === undefined && (
+        <div className="flex flex-col items-center">
+          <span className="text-white font-bold mb-1">Abertura</span>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value={aberturaInterna}
+            onChange={handleAberturaChange}
+            className="cursor-pointer"
+          />
+          <span className="text-white mt-2 font-bold">{aberturaInterna}%</span>
+        </div>
+      )}
     </div>
   );
 };

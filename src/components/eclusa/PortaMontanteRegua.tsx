@@ -1,10 +1,18 @@
 import React, { useState } from 'react';
 
-const PortaMontanteRegua: React.FC = () => {
-  const [abertura, setAbertura] = useState(100); // Estado inicial: 100% (fechada)
+interface PortaMontanteReguaProps {
+  abertura?: number; // Prop para receber o valor do WebSocket (0-100)
+}
+
+const PortaMontanteRegua: React.FC<PortaMontanteReguaProps> = ({ abertura: aberturaExterna }) => {
+  // Estado interno para quando não recebe o valor via prop
+  const [aberturaInterna, setAberturaInterna] = useState(100); // Estado inicial: 100% (fechada)
+
+  // Usa o valor externo se fornecido, senão usa o interno
+  const abertura = aberturaExterna !== undefined ? aberturaExterna : aberturaInterna;
 
   const handleAberturaChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setAbertura(Number(event.target.value));
+    setAberturaInterna(Number(event.target.value));
   };
 
   // Agora a lógica é invertida: 
@@ -220,22 +228,22 @@ const PortaMontanteRegua: React.FC = () => {
         </div>
       </div>
 
-      {/* Controle deslizante para abertura */}
-      <div className="flex items-center gap-4 mt-4" style={{ zIndex: 10, position: 'relative' }}>
-        <span className="text-white font-bold">Aberta</span>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={abertura}
-          onChange={handleAberturaChange}
-          className="cursor-pointer"
-        />
-        <span className="text-white font-bold">Fechada</span>
-      </div>
-
-      {/* Exibir valor da abertura */}
-      <span className="text-white mt-2 font-bold">Abertura: {abertura}%</span>
+      {/* Controle deslizante para abertura - só exibido se não receber valor externo */}
+      {aberturaExterna === undefined && (
+        <div className="flex items-center gap-4 mt-4" style={{ zIndex: 10, position: 'relative' }}>
+          <span className="text-white font-bold">Aberta</span>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value={aberturaInterna}
+            onChange={handleAberturaChange}
+            className="cursor-pointer"
+          />
+          <span className="text-white font-bold">Fechada</span>
+          <span className="text-white ml-2 font-bold">Abertura: {aberturaInterna}%</span>
+        </div>
+      )}
     </div>
   );
 };
